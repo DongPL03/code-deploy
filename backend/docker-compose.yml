@@ -31,6 +31,8 @@ services:
           memory: 512M # Đảm bảo ít nhất 512MB
     # MySQL tuning cho VPS 4GB
     command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
       --innodb-buffer-pool-size=768M
       --max-connections=100
       --innodb-log-file-size=64M
@@ -69,7 +71,7 @@ services:
       - "8088:8088"
     environment:
       # Cấu hình Database (Trỏ vào tên service mysql-container)
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/dau_truong_tri_thuc?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/dau_truong_tri_thuc?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci
 
       # Cấu hình Redis (Trỏ vào tên service redis-container)
       REDIS_HOST: redis-container
