@@ -1,0 +1,192 @@
+<div class="admin-page">
+
+  <div class="stats-row animate-fade-down">
+    <div class="stat-card">
+      <div class="icon-box purple"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <div class="info">
+        <span class="label">Chờ duyệt</span>
+        <span class="value">{{ pendingPosts.length }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="icon-box red"><i class="fa-solid fa-flag"></i></div>
+      <div class="info">
+        <span class="label">Báo cáo mới</span>
+        <span class="value">{{ reports.length }}</span>
+      </div>
+    </div>
+    <!--    <div class="stat-card">-->
+    <!--      <div class="icon-box green"><i class="fa-solid fa-check-circle"></i></div>-->
+    <!--      <div class="info">-->
+    <!--        <span class="label">Đã xử lý hôm nay</span>-->
+    <!--        <span class="value">12</span></div>-->
+    <!--    </div>-->
+  </div>
+
+  <div class="main-card animate-fade-up">
+
+    <div class="toolbar">
+      <div class="tabs">
+        <button class="tab-btn" [class.active]="activeTab === 'pending'" (click)="switchTab('pending')">
+          Bài viết chờ duyệt
+          @if (pendingPosts.length) {
+            <span class="badge">{{ pendingPosts.length }}</span>
+          }
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'reports'" (click)="switchTab('reports')">
+          Xử lý báo cáo
+        </button>
+      </div>
+
+      @if (activeTab === 'reports') {
+        <div class="filter-group">
+          <i class="fa-solid fa-filter"></i>
+          <select [(ngModel)]="reportStatus" (ngModelChange)="onReportStatusChange()">
+            <option value="ALL">Tất cả trạng thái</option>
+            <option value="CHO_XU_LY">Chờ xử lý</option>
+            <option value="DA_XU_LY">Đã xử lý</option>
+          </select>
+        </div>
+      }
+    </div>
+
+    @if (activeTab === 'pending') {
+      <div class="content-body">
+        @if (pendingLoading) {
+          <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu...</div>
+        } @else if (pendingPosts.length === 0) {
+          <div class="empty-state">
+            <img src="assets/images/empty-box.png" alt="Empty" onerror="this.style.display='none'">
+            <p>Tuyệt vời! Không còn bài viết nào chờ duyệt.</p>
+          </div>
+        } @else {
+          <div class="posts-grid">
+            @for (post of pendingPosts; track post.id) {
+              <div class="post-card" [class.processing]="processingIds.has(post.id)">
+
+                <div class="card-header">
+                  <div class="user-info">
+                    <img [src]="getProfileImage(post.nguoiDang?.anhDaiDien)"
+                         [alt]="post.nguoiDang?.ten">
+                    <div class="meta">
+                      <span class="name">{{ post.nguoiDang?.ten || 'Người dùng ẩn' }}</span>
+                      <span class="time">{{ formatDate(post.ngayTao) }}</span>
+                    </div>
+                  </div>
+                  <span class="type-badge" [attr.data-type]="post.loai">{{ getTypeLabel(post.loai) }}</span>
+                </div>
+
+                <div class="card-body">
+                  <h4 class="title"><a [routerLink]="['/community', post.id]" target="_blank">{{ post.tieuDe }}</a></h4>
+                  <p class="excerpt">{{ truncate(post.noiDung, 150) }}</p>
+
+                  @if (post.tags?.length) {
+                    <div class="tags-row">
+                      @for (tag of post.tags; track tag.id) {
+                        <span class="mini-tag" [style.color]="tag.mauSac">#{{ tag.ten }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div class="card-footer">
+                  <button class="btn-action reject" [disabled]="processingIds.has(post.id)"
+                          (click)="openRejectModal(post)">
+                    <i class="fa-solid fa-xmark"></i> Từ chối
+                  </button>
+                  <button class="btn-action approve" [disabled]="processingIds.has(post.id)"
+                          (click)="approvePost(post)">
+                    @if (processingIds.has(post.id)) {
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                    } @else {
+                      <i class="fa-solid fa-check"></i> Duyệt bài
+                    }
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+
+          @if (pendingTotalPages > 1) {
+            <div class="pagination">
+              <button class="btn-nav" [disabled]="pendingPage === 0" (click)="changePendingPage(pendingPage - 1)"><i
+                class="fa-solid fa-chevron-left"></i></button>
+              <span class="page-num">Trang {{ pendingPage + 1 }}</span>
+              <button class="btn-nav" [disabled]="pendingPage >= pendingTotalPages - 1"
+                      (click)="changePendingPage(pendingPage + 1)"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+          }
+        }
+      </div>
+    }
+
+    @if (activeTab === 'reports') {
+      <div class="content-body">
+        @if (reportsLoading) {
+          <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu...</div>
+        } @else if (reports.length === 0) {
+          <div class="empty-state">
+            <p>Hệ thống trong sạch! Không có báo cáo nào.</p>
+          </div>
+        } @else {
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+              <tr>
+                <th>Người báo cáo</th>
+                <th>Lý do</th>
+                <th>Nội dung bị báo cáo</th>
+                <th>Ngày tạo</th>
+                <th>Trạng thái</th>
+                <th class="text-right">Hành động</th>
+              </tr>
+              </thead>
+              <tbody>
+                @for (report of reports; track report.id) {
+                  <tr [class.processing]="processingIds.has(report.id)">
+                    <td>
+                      <div class="user-cell">
+                        <img
+                          [src]="getProfileImage(report.nguoiBaoCao?.anhDaiDien)"
+                          [alt]="report.nguoiBaoCao?.ten">
+                        <span>{{ report.nguoiBaoCao?.ten }}</span>
+                      </div>
+                    </td>
+                    <td><span class="reason-badge">{{ getReportTypeLabel(report.loai) }}</span></td>
+                    <td>
+                      <div class="target-info">
+                        @if (report.baiViet) {
+                          <a [routerLink]="['/community', report.baiViet.id]" target="_blank" class="link-target">
+                            <i class="fa-solid fa-file-alt"></i> Bài viết #{{ report.baiViet.id }}
+                          </a>
+                        } @else {
+                          <span class="comment-target"><i class="fa-solid fa-comment"></i> Bình luận</span>
+                        }
+                        <small class="preview-text">{{ report.chiTiet }}</small>
+                      </div>
+                    </td>
+                    <td>{{ formatDate(report.ngayTao) }}</td>
+                    <td>
+                      <span class="status-pill" [ngClass]="getReportStatusClass(report.trangThai)">
+                        {{ getReportStatusLabel(report.trangThai) }}
+                      </span>
+                    </td>
+                    <td class="text-right">
+                      @if (report.trangThai === 'CHO_XU_LY') {
+                        <button class="btn-sm-action" (click)="openReportModal(report)">
+                          Xử lý ngay
+                        </button>
+                      } @else {
+                        <span class="handled-by">Bởi: {{ report.nguoiXuLy?.ten }}</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

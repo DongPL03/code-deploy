@@ -1,0 +1,235 @@
+<div class="game-dashboard">
+  <!-- 🎵 Music Control Button -->
+  <button class="music-toggle-btn" (click)="toggleMute()"
+    [class.muted]="isMuted" [class.pending]="hasPendingMusic"
+    [title]="hasPendingMusic ? 'Click để bật nhạc' : 'Bật/Tắt nhạc nền'">
+    @if (hasPendingMusic) {
+    <i class="fas fa-play"></i>
+    } @else {
+    <i class="fas"
+      [ngClass]="isMuted ? 'fa-volume-mute' : 'fa-volume-up'"></i>
+    }
+  </button>
+
+  <header class="hero-header">
+    <div class="greeting-content">
+      <h1>Xin chào, <span class="highlight-name">{{ user?.ho_ten
+          }}</span>! 🚀</h1>
+      <p>Sẵn sàng chinh phục đỉnh cao tri thức hôm nay chưa?</p>
+    </div>
+    <div class="header-decoration">
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <aside class="sidebar-panel">
+      <section class="card profile-card">
+        <div class="profile-header">
+          <div class="avatar-container">
+            <i class="fas fa-user-astronaut"></i>
+          </div>
+          <div class="level-badge">Lv. {{ user_summary?.level ?? 1 }}
+          </div>
+        </div>
+
+        <div class="xp-container">
+          <div class="xp-info">
+            <span>XP</span>
+            <span class="xp-val">{{ user_summary?.xp_in_current_level
+              || 0 }}
+              / {{ (user_summary?.xp_in_current_level || 0) +
+              (user_summary?.xp_next_level || 100) }}</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill"
+              [style.width.%]="user_summary?.level_progress_percent || 0">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat-item rank-card">
+          <div class="icon-box rank-icon"><i
+              class="fas fa-trophy"></i></div>
+          <div class="stat-text">
+            <span class="label">Hạng</span>
+            <span class="value">#{{ user_summary?.xep_hang || '--'
+              }}</span>
+          </div>
+        </div>
+
+        <div class="stat-item win-card">
+          <div class="icon-box win-icon"><i
+              class="fas fa-fist-raised"></i></div>
+          <div class="stat-text">
+            <span class="label">Thắng</span>
+            <span class="value">{{ user_summary?.ti_le_thang |
+              percent:'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <div class="stat-item coin-card">
+          <div class="icon-box coin-icon"><i class="fas fa-coins"></i>
+          </div>
+          <div class="stat-text">
+            <span class="label">Vàng</span>
+            <span class="value text-gold">{{ user_summary?.tien_vang
+              ?? 0 }}</span>
+          </div>
+        </div>
+
+        <div class="stat-item score-card">
+          <div class="icon-box score-icon"><i class="fas fa-star"></i>
+          </div>
+          <div class="stat-text">
+            <span class="label">Điểm</span>
+            <span class="value">{{ user_summary?.tong_diem |
+              number:'1.0-0' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <button class="btn-3d btn-weekly" (click)="claimWeeklyReward()">
+        <span class="icon">🎁</span> Nhận quà tuần
+      </button>
+    </aside>
+
+    <main class="content-panel">
+
+      <section class="action-center">
+        <button class="btn-3d btn-battle-big"
+          (click)="navigateBattle()">
+          <div class="btn-content">
+            <i class="fas fa-swords"></i>
+            <span>TÌM TRẬN ĐẤU</span>
+          </div>
+          <div class="shine-effect"></div>
+        </button>
+      </section>
+      <!--        <div class="sub-actions">-->
+      <!--          <button class="btn-3d btn-secondary" >-->
+      <!--            <i class="fas fa-plus"></i> Tạo câu hỏi-->
+      <!--          </button>-->
+      <!--          <button class="btn-3d btn-secondary" (click)="navigatePractice()">-->
+      <!--            <i class="fas fa-dumbbell"></i> Luyện tập-->
+      <!--          </button>-->
+      <!--          <button class="btn-3d btn-secondary" (click)="navigateFriend()">-->
+      <!--            <i class="fas fa-user-friends"></i> Bạn bè-->
+      <!--          </button>-->
+      <!--          <button class="btn-3d btn-secondary" (click)="navigateRecommendation()">-->
+      <!--            <i class="fas fa-lightbulb"></i> Gợi ý học tập-->
+      <!--          </button>-->
+      <!--        </div>-->
+      <section class="quick-access-grid">
+        <!--        <button class="btn-quick-access purple" routerLink="/tran-dau/pending">-->
+        <!--          <i class="fas fa-bolt"></i> <span>Đấu Trường</span>-->
+        <!--        </button>-->
+        <button class="btn-quick-access blue"
+          (click)="navigateQuiz()">
+          <i class="fas fa-book-open"></i> <span>Kho Bộ Câu Hỏi</span>
+        </button>
+        <button class="btn-quick-access green"
+          (click)="navigateCourse()">
+          <i class="fas fa-graduation-cap"></i> <span>Khóa Học</span>
+        </button>
+        <button class="btn-3d btn-secondary"
+          (click)="navigatePractice()">
+          <i class="fas fa-dumbbell"></i> Luyện tập
+        </button>
+        <button class="btn-quick-access yellow"
+          (click)="navigateLeaderboard()">
+          <i class="fas fa-trophy"></i> <span>BXH</span>
+        </button>
+        <button class="btn-quick-access orange"
+          (click)="navigateMission()">
+          <i class="fas fa-tasks"></i> <span>Nhiệm Vụ</span>
+        </button>
+        <!--        <button class="btn-quick-access teal" (click)="navigateInventory()">-->
+        <!--          <i class="fas fa-box-open"></i> <span>Kho Đồ</span>-->
+        <!--        </button>-->
+      </section>
+
+      <section class="card feed-card">
+        <h2 class="card-title">🔥 Vừa diễn ra</h2>
+        <div class="feed-list">
+          @if (recent_matches.length > 0) {
+          @for (m of recent_matches; track m.lich_su_id) {
+          <div class="feed-row" [class.is-winner]="m.xep_hang === 1">
+            <div class="feed-status">
+              @if (m.xep_hang === 1) {
+              <span class="badge-win">VICTORY</span>
+              } @else {
+              <span class="badge-rank">TOP {{ m.xep_hang }}</span>
+              }
+            </div>
+            <div class="feed-detail">
+              <p class="quiz-name">{{ m.bo_cau_hoi_tieu_de }}</p>
+              <p class="quiz-score">+{{ m.tong_diem }} điểm • {{
+                m.hoan_thanh_luc | date:'HH:mm' }}</p>
+            </div>
+          </div>
+          }
+          } @else {
+          <div class="empty-state">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/7486/7486747.png"
+              alt="Empty">
+            <p>Chưa có trận đấu nào. Chiến ngay đi!</p>
+          </div>
+          }
+        </div>
+      </section>
+
+      <div class="bottom-grid">
+        <section class="card room-card">
+          <div class="card-header">
+            <h2 class="card-title">📡 Phòng Chờ</h2>
+            <button class="btn-text" (click)="navigateBattle()">Xem
+              tất cả</button>
+          </div>
+          @if (pendingBattles.length > 0) {
+          <div class="room-list">
+            @for (b of pendingBattles; track b.id) {
+            <div class="room-item">
+              <span class="room-id">#{{ b.ma_phong }}</span>
+              <button class="btn-sm btn-join"
+                (click)="tryJoinRoom(b)">Vào ngay</button>
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="empty-state">
+            <p class="empty-text">Không có phòng chờ.</p>
+            <button class="btn-sm btn-create"
+              (click)="createRoom()">Tạo phòng</button>
+          </div>
+          }
+        </section>
+
+        <section class="featured-quiz-card">
+          <h2>📚 Bộ câu hỏi nổi bật</h2>
+          @if (featuredQuizzes.length > 0) {
+          <ul>
+            @for (q of featuredQuizzes; track q.id) {
+            <li class="quiz-item">
+              <div class="quiz-info">
+                <span class="quiz-category-tag">{{ q.chu_de ?? 'Chưa
+                  có' }}</span>
+                <p class="quiz-title">{{ q.tieu_de }}</p>
+                <p class="quiz-meta">Người tạo: {{ q.nguoi_tao ?? 'Ẩn
+                  danh' }}</p>
+              </div>
+              <button class="btn-train">Luyện tập</button>
+            </li>
+            }
+          </ul>
+          } @else {
+          <p class="no-data">Chưa có bộ câu hỏi nào nổi bật</p>
+          }
+        </section>
+      </div>
+
+    </main>
+  </div>
+</div>

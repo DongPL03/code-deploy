@@ -1,0 +1,294 @@
+<div class="page-wrapper">
+  <div class="bg-decoration shape-1"></div>
+  <div class="bg-decoration shape-2"></div>
+
+  <div class="create-card">
+    <header class="create-header">
+      <div class="header-icon">
+        <i class="fas fa-gamepad"></i>
+      </div>
+      <h1>Thiết lập đấu trường</h1>
+      <p>Tùy chỉnh luật chơi và thách thức đối thủ!</p>
+    </header>
+
+    <form #createForm="ngForm" (ngSubmit)="onSubmit()" class="create-form" autocomplete="off">
+
+      <section class="form-section">
+        <h3 class="section-title"><i class="fas fa-sliders-h"></i> Cấu hình chung</h3>
+
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Tên phòng đấu <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <i class="fas fa-signature input-icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="form.ten_phong"
+                name="ten_phong"
+                placeholder="VD: Đại chiến lịch sử..."
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Bộ câu hỏi <span class="required">*</span></label>
+            <div class="select-wrapper">
+              <i class="fas fa-book-open input-icon"></i>
+              <select
+                [(ngModel)]="form.bo_cau_hoi_id"
+                name="bo_cau_hoi_id"
+                required
+                (ngModelChange)="onBoCauHoiChanged($event)"
+                [disabled]="loading_sets"
+              >
+                <option [ngValue]="0" disabled>— Chọn bộ câu hỏi —</option>
+                @for (bo of boCauHoiOptions; track bo.id) {
+                  <option [ngValue]="bo.id">{{ bo.tieu_de }}</option>
+                }
+              </select>
+              <i class="fas fa-chevron-down arrow-icon"></i>
+            </div>
+            @if (loading_sets) {
+              <small class="hint"><i class="fas fa-spinner fa-spin"></i> Đang tải danh sách...</small>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h3 class="section-title"><i class="fas fa-trophy"></i> Chế độ thi đấu</h3>
+
+        <div class="visual-radio-group">
+          <label class="visual-card casual-card" [class.selected]="form.loai_tran_dau === 'THUONG'">
+            <input
+              type="radio"
+              name="loai_tran_dau"
+              [(ngModel)]="form.loai_tran_dau"
+              value="CASUAL"
+              (change)="onLoaiTranDauChange('THUONG')"
+              hidden
+            >
+            <div class="card-icon"><i class="fas fa-coffee"></i></div>
+            <div class="card-info">
+              <span class="card-title">Đấu Vui (Casual)</span>
+              <span class="card-desc">Không tính điểm xếp hạng. Chơi để giải trí.</span>
+            </div>
+            <div class="check-mark"><i class="fas fa-check"></i></div>
+          </label>
+
+          <label class="visual-card ranked-card" [class.selected]="form.loai_tran_dau === 'XEP_HANG'">
+            <input
+              type="radio"
+              name="loai_tran_dau"
+              [(ngModel)]="form.loai_tran_dau"
+              value="RANKED"
+              (change)="onLoaiTranDauChange('XEP_HANG')"
+              hidden
+            >
+            <div class="card-icon"><i class="fas fa-crown"></i></div>
+            <div class="card-info">
+              <span class="card-title">Xếp Hạng (Ranked)</span>
+              <span class="card-desc">Cạnh tranh gay gắt. Thắng cộng điểm, thua trừ điểm.</span>
+            </div>
+            <div class="check-mark"><i class="fas fa-check"></i></div>
+          </label>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h3 class="section-title"><i class="fas fa-shield-alt"></i> Quyền riêng tư & Luật</h3>
+
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Ai có thể tham gia?</label>
+            <div class="segment-control">
+              <label class="segment-item" [class.active]="form.cong_khai">
+                <input type="radio" name="cong_khai" [value]="true" [(ngModel)]="form.cong_khai" hidden>
+                <i class="fas fa-globe"></i> Công khai
+              </label>
+              <label class="segment-item" [class.active]="!form.cong_khai">
+                <input type="radio" name="cong_khai" [value]="false" [(ngModel)]="form.cong_khai" hidden>
+                <i class="fas fa-lock"></i> Riêng tư (Cần PIN)
+              </label>
+            </div>
+          </div>
+
+          @if (!form.cong_khai) {
+            <div class="form-group pin-group full-width">
+              <label>Mã PIN vào phòng <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fas fa-key input-icon"></i>
+                <input
+                  type="text"
+                  maxlength="10"
+                  [(ngModel)]="form.ma_pin"
+                  name="ma_pin"
+                  class="pin-input"
+                  placeholder="Nhập mã bí mật..."
+                />
+              </div>
+            </div>
+          }
+
+          <div class="form-group">
+            <label>Giới hạn người (2-4)</label>
+            <div class="number-control">
+              <input
+                type="number"
+                min="2"
+                max="4"
+                [(ngModel)]="form.gioi_han_nguoi_choi"
+                name="gioi_han_nguoi_choi"
+              >
+              <span class="unit">người</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Thời gian/câu (giây)</label>
+            <div class="number-control">
+              <input
+                type="number"
+                min="5"
+                max="120"
+                [(ngModel)]="form.gioi_han_thoi_gian_cau_giay"
+                name="gioi_han_thoi_gian_cau_giay"
+              >
+              <span class="unit">giây</span>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Luật tính điểm</label>
+            <div class="select-wrapper">
+              <select [(ngModel)]="form.luat_tinh_diem" name="luat_tinh_diem">
+                <option value="" disabled selected hidden>-- Chọn luật --</option>
+                <option value="CO_BAN">Điểm cơ bản</option>
+                <option value="THUONG_TOC_DO">Điểm cơ bản + điểm thưởng thời gian</option>
+              </select>
+              <i class="fas fa-chevron-down arrow-icon"></i>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <div class="actions-footer">
+        <button type="button" class="btn-ghost" (click)="cancel()">
+          Hủy bỏ
+        </button>
+        <button type="submit" class="btn-primary-3d" [disabled]="saving">
+          @if (saving) {
+            <i class="fas fa-spinner fa-spin"></i> Đang tạo...
+          } @else {
+            🚀 TẠO PHÒNG NGAY
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+@if (isModalOpen) {
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+
+  <div class="modal-container">
+    <div class="modal-content">
+
+      <header class="modal-header">
+        <div class="header-left">
+          <div class="icon-box"><i class="fas fa-search"></i></div>
+          <div class="header-text">
+            <h2>{{ getTieuDeBoCauHoi() }}</h2>
+            <span class="meta-tag">
+              <i class="fas fa-layer-group"></i> {{ preview_total || 0 }} câu hỏi
+            </span>
+          </div>
+        </div>
+        <button class="btn-close" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </header>
+
+      <div class="modal-body">
+        @if (!preview_loading) {
+
+          <div class="stat-section">
+            <h4 class="stat-title"><i class="fas fa-chart-bar"></i> Phân bố độ khó</h4>
+            <div class="difficulty-grid">
+              @if (preview_difficulty_counts['DE']) {
+                <div class="stat-pill level-easy">
+                  <div class="pill-icon"><i class="fas fa-laugh-beam"></i></div>
+                  <div class="pill-info">
+                    <span class="label">Dễ</span>
+                    <span class="value">{{ preview_difficulty_counts['DE'] }}</span>
+                  </div>
+                </div>
+              }
+
+              @if (preview_difficulty_counts['TRUNG_BINH']) {
+                <div class="stat-pill level-medium">
+                  <div class="pill-icon"><i class="fas fa-meh"></i></div>
+                  <div class="pill-info">
+                    <span class="label">Vừa</span>
+                    <span class="value">{{ preview_difficulty_counts['TRUNG_BINH'] }}</span>
+                  </div>
+                </div>
+              }
+
+              @if (preview_difficulty_counts['KHO']) {
+                <div class="stat-pill level-hard">
+                  <div class="pill-icon"><i class="fas fa-dizzy"></i></div>
+                  <div class="pill-info">
+                    <span class="label">Khó</span>
+                    <span class="value">{{ preview_difficulty_counts['KHO'] }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="stat-section">
+            <h4 class="stat-title"><i class="fas fa-shapes"></i> Định dạng câu hỏi</h4>
+            <div class="type-grid">
+              @if (preview_type_counts['VAN_BAN']) {
+                <div class="type-card">
+                  <i class="fas fa-font type-icon"></i>
+                  <span>Văn bản</span>
+                  <strong>{{ preview_type_counts['VAN_BAN'] }}</strong>
+                </div>
+              }
+
+              @if (preview_type_counts['HINH_ANH']) {
+                <div class="type-card">
+                  <i class="fas fa-image type-icon"></i>
+                  <span>Hình ảnh</span>
+                  <strong>{{ preview_type_counts['HINH_ANH'] }}</strong>
+                </div>
+              }
+
+              @if (preview_type_counts['AM_THANH']) {
+                <div class="type-card">
+                  <i class="fas fa-music type-icon"></i>
+                  <span>Âm thanh</span>
+                  <strong>{{ preview_type_counts['AM_THANH'] }}</strong>
+                </div>
+              }
+            </div>
+          </div>
+
+        } @else {
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Đang phân tích dữ liệu...</p>
+          </div>
+        }
+      </div>
+
+      <footer class="modal-footer">
+        <button class="btn-confirm" (click)="closeModal()">Đã hiểu</button>
+      </footer>
+    </div>
+  </div>
+}

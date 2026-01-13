@@ -1,0 +1,220 @@
+server:
+  port: 8088
+  # ========== Response Compression (Tăng tốc độ tải trang) ==========
+  compression:
+    enabled: ${COMPRESSION_ENABLED:true}
+    mime-types:
+      - application/json
+      - application/xml
+      - text/html
+      - text/xml
+      - text/plain
+      - text/css
+      - application/javascript
+      - text/javascript
+    min-response-size: 1024 # Chỉ nén response >= 1KB
+  # Tomcat tuning
+  tomcat:
+    threads:
+      max: ${TOMCAT_MAX_THREADS:200} # VPS 4GB: 200 threads
+      min-spare: ${TOMCAT_MIN_SPARE_THREADS:10}
+    max-connections: ${TOMCAT_MAX_CONNECTIONS:8192}
+    accept-count: ${TOMCAT_ACCEPT_COUNT:100}
+    connection-timeout: 20000 # 20s
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/dau_truong_tri_thuc?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: dongle170503
+    # ========== HikariCP Connection Pool Config ==========
+    hikari:
+      # Số connection tối đa trong pool (tùy thuộc vào RAM server)
+      # VPS 2GB RAM: 10-15, VPS 4GB: 20-30, VPS 8GB+: 30-50
+      maximum-pool-size: ${HIKARI_MAX_POOL_SIZE:20}
+      # Số connection tối thiểu duy trì (idle)
+      minimum-idle: ${HIKARI_MIN_IDLE:5}
+      # Thời gian chờ lấy connection từ pool (30s)
+      connection-timeout: 30000
+      # Thời gian connection idle trước khi bị đóng (10 phút)
+      idle-timeout: 600000
+      # Thời gian tối đa 1 connection tồn tại (30 phút) - tránh stale connections
+      max-lifetime: 1800000
+      # Tên pool để dễ debug
+      pool-name: DauTruongTriThuc-HikariPool
+      # Kiểm tra connection còn sống không trước khi sử dụng
+      connection-test-query: SELECT 1
+      # Leak detection - cảnh báo nếu connection không được trả về sau 60s
+      leak-detection-threshold: 60000
+  jpa:
+    # ⚠️ TẮT show-sql trong production để tăng performance
+    show-sql: ${JPA_SHOW_SQL:false}
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        # Tắt format_sql trong production
+        format_sql: ${JPA_FORMAT_SQL:false}
+        # ========== Hibernate Performance Tuning ==========
+        # Batch insert/update để giảm số lượng queries
+        jdbc:
+          batch_size: 25
+          batch_versioned_data: true
+        # Sắp xếp inserts/updates theo entity để tối ưu batch
+        order_inserts: true
+        order_updates: true
+        # Tắt query statistics trong production
+        generate_statistics: ${HIBERNATE_STATS:false}
+        # Connection handling - DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION
+        connection:
+          handling_mode: DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION
+    # Mở lazy loading trong view (cẩn thận N+1 problem)
+    open-in-view: false
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    default-locale: en
+  data:
+    redis:
+      #spring.data.redis.use-redis-cache
+      use-redis-cache: true
+      host: ${REDIS_HOST:localhost} # Default to 'localhost' if not provided
+      #host: ${REDIS_HOST:ubuntu-server-01.local} # Default to 'localhost' if not provided
+      port: ${REDIS_PORT:6379} # Default to 6379 if not provided
+api:
+  prefix: /api/v1
+jwt:
+  expiration: 2592000 #30 days = 30 * 24 * 60 * 60
+  expiration-refresh-token: 5184000 #60 days = 60 * 24 * 60 * 60
+  secretKey: ${JWT_SECRET_KEY}
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: dongleepham@gmail.com
+  password: tckhxfshrzoieqrn
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+          required: true
+
+# ========== Async Thread Pool Config ==========
+# Cấu hình thread pool cho @Async operations (VPS 4GB / 2vCPU)
+async:
+  executor:
+    # Số threads luôn active (2 vCPU → 4 core)
+    core-pool-size: ${ASYNC_CORE_POOL_SIZE:4}
+    # Số threads tối đa khi queue đầy
+    max-pool-size: ${ASYNC_MAX_POOL_SIZE:8}
+    # Số tasks chờ trong queue
+    queue-capacity: ${ASYNC_QUEUE_CAPACITY:100}
+    # Thời gian thread idle trước khi bị thu hồi (giây)
+    keep-alive-seconds: ${ASYNC_KEEP_ALIVE_SECONDS:60}
+
+# ========== Rate Limiting Config ==========
+# Giới hạn số request để bảo vệ server khỏi spam/DDoS
+rate-limit:
+  # Bật/tắt rate limiting (tắt khi development)
+  enabled: ${RATE_LIMIT_ENABLED:true}
+
+  # Auth endpoints (login, register, forgot-password)
+  # Giới hạn nghiêm ngặt để chống brute-force
+  auth:
+    capacity: ${RATE_LIMIT_AUTH_CAPACITY:5} # Số request tối đa
+    refill-tokens: ${RATE_LIMIT_AUTH_REFILL:5} # Số token refill
+    refill-minutes: ${RATE_LIMIT_AUTH_REFILL_MINS:1} # Refill mỗi X phút
+
+  # General API endpoints
+  api:
+    capacity: ${RATE_LIMIT_API_CAPACITY:60}
+    refill-tokens: ${RATE_LIMIT_API_REFILL:60}
+    refill-minutes: ${RATE_LIMIT_API_REFILL_MINS:1}
+
+  # Upload endpoints
+  upload:
+    capacity: ${RATE_LIMIT_UPLOAD_CAPACITY:10}
+    refill-tokens: ${RATE_LIMIT_UPLOAD_REFILL:10}
+    refill-minutes: ${RATE_LIMIT_UPLOAD_REFILL_MINS:5}
+
+app:
+  base-url: http://localhost:8088
+  email-verification:
+    ttl-hours: 24
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://127.0.0.1:4200,http://103.200.21.203}
+
+# ========== Spring Boot Actuator (Health Check & Monitoring) ==========
+management:
+  endpoints:
+    web:
+      exposure:
+        # Chỉ expose health, info, metrics cho production
+        include: ${ACTUATOR_ENDPOINTS:health,info,metrics}
+      base-path: /actuator
+  endpoint:
+    health:
+      # Hiển thị chi tiết health check (MySQL, Redis, Disk...)
+      show-details: ${HEALTH_SHOW_DETAILS:when-authorized}
+      show-components: ${HEALTH_SHOW_COMPONENTS:when-authorized}
+      probes:
+        enabled: true # Enable Kubernetes liveness/readiness probes
+  health:
+    # Kiểm tra disk space
+    diskspace:
+      enabled: true
+      threshold: 1GB # Cảnh báo nếu còn < 1GB
+    # Kiểm tra database connection
+    db:
+      enabled: true
+    # Kiểm tra Redis connection
+    redis:
+      enabled: true
+  metrics:
+    export:
+      simple:
+        enabled: true
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+
+# Info endpoint - thông tin ứng dụng
+info:
+  app:
+    name: Đấu Trường Tri Thức API
+    description: Quiz Battle Game Platform
+    version: 1.0.0
+    encoding: UTF-8
+    java:
+      version: 21
+
+# ========== Logging Configuration (Production) ==========
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    com.app.backend: ${LOG_LEVEL_APP:INFO}
+    org.springframework.web: ${LOG_LEVEL_SPRING_WEB:WARN}
+    org.springframework.security: ${LOG_LEVEL_SPRING_SECURITY:WARN}
+    org.hibernate.SQL: ${LOG_LEVEL_HIBERNATE_SQL:WARN}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_HIBERNATE_BINDER:WARN}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE_PATH:./logs/app.log}
+    max-size: 10MB
+    max-history: 30
+    total-size-cap: 500MB

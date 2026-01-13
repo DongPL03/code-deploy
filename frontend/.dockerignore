@@ -1,0 +1,52 @@
+# Frontend Docker Ignore
+# Giảm build context size và tăng tốc docker build
+
+# Dependencies
+node_modules/
+.npm/
+.pnpm-store/
+
+# Build outputs (sẽ build trong container)
+dist/
+build/
+
+# Test files
+coverage/
+.nyc_output/
+*.spec.ts
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+*.temp
+.angular/
+.sass-cache/
+
+# Documentation
+README.md
+CHANGELOG.md
+docs/
+
+# Test configs
+karma.conf.js
+protractor.conf.js
+e2e/

@@ -1,0 +1,326 @@
+<div class="admin-bch-detail animate-fade-down">
+
+  <div class="page-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i> Quay lại
+      </button>
+      <div class="title-wrapper">
+        <h1 class="page-title">{{ bo_cau_hoi?.tieu_de }}</h1>
+        @if (bo_cau_hoi?.is_official) {
+          <span class="badge-official" title="Official Quiz"><i class="fas fa-check-circle"></i> Official</span>
+        }
+      </div>
+    </div>
+
+    <div class="header-actions">
+      @if (co_quyen_sua) {
+        <button class="btn-primary" (click)="goToEditBo()">
+          <i class="fas fa-pen"></i> Chỉnh sửa
+        </button>
+      }
+
+      <div ngbDropdown container="body" placement="bottom-end" class="d-inline-block">
+        <button class="btn-more-action" ngbDropdownToggle>
+          <i class="fas fa-ellipsis-h"></i>
+        </button>
+        <div ngbDropdownMenu class="custom-dropdown">
+          <button ngbDropdownItem (click)="duplicateBo()">
+            <i class="fas fa-copy"></i> Duplicate (Nhân bản)
+          </button>
+
+          @if (co_quyen_sua) {
+            @if (!bo_cau_hoi?.is_official) {
+              <button ngbDropdownItem (click)="markOfficialBo()">
+                <i class="fas fa-star"></i> Đánh dấu Official
+              </button>
+            } @else {
+              <button ngbDropdownItem (click)="disMarkOfficialBo()">
+                <i class="far fa-star"></i> Bỏ đánh dấu Official
+              </button>
+            }
+
+            <div class="dropdown-divider"></div>
+            <button ngbDropdownItem class="text-danger" (click)="deleteBo()">
+              <i class="fas fa-trash-alt"></i> Xóa bộ câu hỏi
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      Đang tải dữ liệu...
+    </div>
+  } @else if (bo_cau_hoi) {
+
+    <div class="info-card">
+      <div class="status-bar">
+        <span class="status-badge" [ngClass]="bo_cau_hoi.trang_thai">
+          {{ mapTrangThai(bo_cau_hoi.trang_thai) }}
+        </span>
+
+        @if (bo_cau_hoi.trang_thai === 'CHO_DUYET') {
+          <div class="approval-actions">
+            <button class="btn-approve" (click)="approveBo()">
+              <i class="fas fa-check"></i> Duyệt
+            </button>
+            <button class="btn-reject" (click)="rejectBo()">
+              <i class="fas fa-times"></i> Từ chối
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="lbl">Chủ đề</span>
+          <span class="val text-primary fw-bold">{{ bo_cau_hoi.chu_de || 'Chưa phân loại' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="lbl">Người tạo</span>
+          <div class="user-chip">
+            <div class="avt">{{ (bo_cau_hoi.nguoi_tao || '?')[0] | uppercase }}</div>
+            <span>{{ bo_cau_hoi.nguoi_tao }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <span class="lbl">Số câu hỏi</span>
+          <span class="val fw-bold">{{ cau_hoi_list.length }} câu</span>
+        </div>
+        <div class="info-item">
+          <span class="lbl">Ngày tạo</span>
+          <span class="val">{{ formatDate(bo_cau_hoi.tao_luc) }}</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="tags-row">
+        <div class="tag-box" [ngClass]="getUsageClass(bo_cau_hoi.loai_su_dung)">
+          <i [class]="getUsageIcon(bo_cau_hoi.loai_su_dung)"></i>
+          <span>{{ bo_cau_hoi.loai_su_dung }}</span>
+        </div>
+
+        @if (bo_cau_hoi.muon_tao_tra_phi) {
+          <div class="tag-box gold">
+            <i class="fas fa-coins"></i>
+            {{ bo_cau_hoi.trang_thai === 'CHO_DUYET' ? 'User muốn trả phí' : (bo_cau_hoi.gia_mo_khoa + 'G') }}
+          </div>
+        } @else {
+          <div class="tag-box green"><i class="fas fa-gift"></i> Miễn phí</div>
+        }
+
+        <div class="tag-box gray">
+          <i class="fas" [class.fa-globe]="bo_cau_hoi.che_do_hien_thi === 'PUBLIC'"
+             [class.fa-lock]="bo_cau_hoi.che_do_hien_thi === 'PRIVATE'"></i>
+          {{ bo_cau_hoi.che_do_hien_thi === 'PUBLIC' ? 'Công khai' : 'Riêng tư' }}
+        </div>
+      </div>
+
+      @if (bo_cau_hoi.mo_ta) {
+        <div class="desc-box">
+          <p>{{ bo_cau_hoi.mo_ta }}</p>
+        </div>
+      }
+
+      @if (bo_cau_hoi.trang_thai === 'TU_CHOI' && bo_cau_hoi.ly_do_tu_choi) {
+        <div class="reject-box">
+          <strong><i class="fas fa-exclamation-triangle"></i> Lý do từ chối:</strong> {{ bo_cau_hoi.ly_do_tu_choi }}
+        </div>
+      }
+    </div>
+
+    <div class="questions-section">
+      <div class="section-header">
+        <h3>Danh sách câu hỏi ({{ cau_hoi_list.length }})</h3>
+        @if (co_quyen_sua) {
+          <button class="btn-add" (click)="goToAddQuestion()">
+            <i class="fas fa-plus"></i> Thêm câu hỏi
+          </button>
+        }
+      </div>
+
+      <div class="table-card custom-scrollbar">
+        <table class="modern-table">
+          <thead>
+          <tr>
+            <th style="width: 50px">#</th>
+            <th style="width: 45%">Nội dung</th>
+            <th>Đáp án</th>
+            <th>Độ khó</th>
+            @if (co_quyen_sua) {
+              <th class="text-right">Hành động</th>
+            }
+          </tr>
+          </thead>
+          <tbody>
+            @for (q of cau_hoi_list; track q.id; let i = $index) {
+              <tr>
+                <td class="text-muted fw-bold">{{ i + 1 }}</td>
+
+                <td>
+                  <div class="question-content">
+                    <p class="q-text">{{ q.noi_dung }}</p>
+
+                    @if (q.loai_noi_dung !== 'VAN_BAN') {
+                      <div class="media-wrapper">
+                        @if (q.loai_noi_dung === 'HINH_ANH') {
+                          <img
+                            [src]="getMediaUrl(q.duong_dan_tep)"
+                            class="q-img"
+                            (click)="previewQuestionDetail(q)">
+                        }
+                        @if (q.loai_noi_dung === 'AM_THANH') {
+                          <audio controls
+                                 [src]="getMediaUrl(q.duong_dan_tep)">
+                          </audio>
+                        }
+                        @if (q.loai_noi_dung === 'VIDEO') {
+                          <video controls
+                                 [src]="getMediaUrl(q.duong_dan_tep)"
+                                 class="q-video">
+                          </video>
+                        }
+                      </div>
+                    }
+                  </div>
+                </td>
+
+                <td>
+                  <div class="answers-list">
+                    <div class="ans-row" [class.correct]="q.dap_an_dung === 'A'"><span
+                      class="lbl">A.</span> {{ q.lua_chon_a }}
+                    </div>
+                    <div class="ans-row" [class.correct]="q.dap_an_dung === 'B'"><span
+                      class="lbl">B.</span> {{ q.lua_chon_b }}
+                    </div>
+                    <div class="ans-row" [class.correct]="q.dap_an_dung === 'C'"><span
+                      class="lbl">C.</span> {{ q.lua_chon_c }}
+                    </div>
+                    <div class="ans-row" [class.correct]="q.dap_an_dung === 'D'"><span
+                      class="lbl">D.</span> {{ q.lua_chon_d }}
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  <span class="badge-difficulty" [ngClass]="q.do_kho">
+                    {{ mapDoKho(q.do_kho) }}
+                  </span>
+                </td>
+
+                @if (co_quyen_sua) {
+                  <td class="text-right">
+                    <div ngbDropdown container="body" placement="bottom-end" class="d-inline-block">
+                      <button class="btn-more" ngbDropdownToggle><i class="fas fa-ellipsis-v"></i></button>
+                      <div ngbDropdownMenu class="custom-dropdown">
+                        <button ngbDropdownItem (click)="previewQuestionDetail(q)">
+                          <i class="fas fa-eye"></i> Preview
+                        </button>
+                        <button ngbDropdownItem (click)="goToEditQuestion(q.id)">
+                          <i class="fas fa-edit"></i> Chỉnh sửa
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button ngbDropdownItem class="text-danger" (click)="onDeleteQuestion(q.id)">
+                          <i class="fas fa-trash-alt"></i> Xóa câu hỏi
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                }
+              </tr>
+            }
+            @if (cau_hoi_list.length === 0) {
+              <tr>
+                <td colspan="5" class="empty-state">Chưa có câu hỏi nào.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  }
+
+  @if (showPreviewModal && previewQuestion) {
+    <div class="modal-backdrop fade-in" (click)="closePreview()">
+      <div class="modal-panel slide-up" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3><i class="fas fa-eye"></i> Xem trước câu hỏi</h3>
+          <button class="btn-close" (click)="closePreview()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="modal-body custom-scrollbar">
+          <div class="preview-content-box">
+            @if (previewQuestion.loai_noi_dung === 'HINH_ANH') {
+              <img
+                [src]="getMediaUrl(previewQuestion.duong_dan_tep)"
+                class="preview-img">
+            }
+            @if (previewQuestion.loai_noi_dung === 'VIDEO') {
+              <video controls
+                     [src]="getMediaUrl(previewQuestion.duong_dan_tep)"
+                     class="preview-video">
+              </video>
+            }
+            @if (previewQuestion.loai_noi_dung === 'AM_THANH') {
+              <audio controls
+                     [src]="getMediaUrl(previewQuestion.duong_dan_tep)"
+                     class="preview-audio">
+              </audio>
+            }
+
+            <p class="preview-q-text">{{ previewQuestion.noi_dung }}</p>
+          </div>
+
+          <div class="preview-answers">
+            <div class="p-ans" [class.correct]="previewQuestion.dap_an_dung === 'A'">
+              <span class="letter">A</span> {{ previewQuestion.lua_chon_a }}
+              @if (previewQuestion.dap_an_dung === 'A') {
+                <i class="fas fa-check-circle"></i>
+              }
+            </div>
+            <div class="p-ans" [class.correct]="previewQuestion.dap_an_dung === 'B'">
+              <span class="letter">B</span> {{ previewQuestion.lua_chon_b }}
+              @if (previewQuestion.dap_an_dung === 'B') {
+                <i class="fas fa-check-circle"></i>
+              }
+            </div>
+            <div class="p-ans" [class.correct]="previewQuestion.dap_an_dung === 'C'">
+              <span class="letter">C</span> {{ previewQuestion.lua_chon_c }}
+              @if (previewQuestion.dap_an_dung === 'C') {
+                <i class="fas fa-check-circle"></i>
+              }
+            </div>
+            <div class="p-ans" [class.correct]="previewQuestion.dap_an_dung === 'D'">
+              <span class="letter">D</span> {{ previewQuestion.lua_chon_d }}
+              @if (previewQuestion.dap_an_dung === 'D') {
+                <i class="fas fa-check-circle"></i>
+              }
+            </div>
+          </div>
+
+          @if (previewQuestion.giai_thich) {
+            <div class="preview-explain">
+              <strong><i class="fas fa-lightbulb"></i> Giải thích:</strong> {{ previewQuestion.giai_thich }}
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          @if (co_quyen_sua) {
+            <button class="btn-edit-modal" (click)="goToEditQuestion(previewQuestion.id); closePreview()">
+              <i class="fas fa-edit"></i> Chỉnh sửa
+            </button>
+          }
+          <button class="btn-close-text" (click)="closePreview()">Đóng</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

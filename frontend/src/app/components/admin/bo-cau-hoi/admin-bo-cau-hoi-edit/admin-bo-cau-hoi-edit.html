@@ -1,0 +1,124 @@
+@if (!loading) {
+  <div class="edit-quiz-page animate-fade-down">
+
+    <div class="page-header">
+      <button class="btn-back" (click)="cancel()">
+        <i class="fas fa-arrow-left"></i> Quay lại
+      </button>
+    </div>
+
+    <div class="form-card">
+      <div class="card-header">
+        <h2><i class="fas fa-edit"></i> Chỉnh sửa bộ câu hỏi</h2>
+        <p>Cập nhật thông tin chi tiết cho bộ câu hỏi #{{ bo_cau_hoi_id }}</p>
+      </div>
+
+      <form #editForm="ngForm" (ngSubmit)="onSubmit(editForm)" autocomplete="off">
+        <div class="card-body">
+
+          <div class="form-section">
+            <h3 class="section-title">Thông tin chung</h3>
+
+            <div class="form-group">
+              <label>Tiêu đề <span class="required">*</span></label>
+              <input type="text" name="tieu_de" [(ngModel)]="dto.tieu_de" required maxlength="100" class="form-input"/>
+            </div>
+
+            <div class="form-group">
+              <label>Mô tả ngắn</label>
+              <textarea name="mo_ta" [(ngModel)]="dto.mo_ta" rows="3" maxlength="255" class="form-textarea"></textarea>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Chủ đề <span class="required">*</span></label>
+              <select name="chu_de_id" [(ngModel)]="dto.chu_de_id" required class="form-select">
+                @for (c of chu_des; track c.id) {
+                  <option [value]="c.id">{{ c.ten }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Chế độ hiển thị</label>
+              <select name="che_do_hien_thi" [(ngModel)]="dto.che_do_hien_thi" class="form-select">
+                <option value="PUBLIC">🌍 Công khai</option>
+                <option value="PRIVATE">🔒 Riêng tư</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="form-group">
+            <label class="section-label">Mục đích sử dụng <span class="required">*</span></label>
+            <div class="selection-grid">
+              @for (opt of loaiSuDungOptions; track opt.value) {
+                <div class="selection-card"
+                     [class.selected]="dto.loai_su_dung === opt.value"
+                     (click)="dto.loai_su_dung = opt.value">
+                  <input type="radio" name="loai_su_dung" [value]="opt.value" [(ngModel)]="dto.loai_su_dung" hidden>
+
+                  <div class="check-icon"><i class="fas fa-check-circle"></i></div>
+                  <div class="card-icon" [ngClass]="getIconColor(opt.value)"><i class="fas" [ngClass]="opt.icon"></i>
+                  </div>
+
+                  <div class="card-info">
+                    <h4>{{ opt.label }}</h4>
+                    <p>{{ getUsageDesc(opt.value) }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="section-label">Loại phí tham gia</label>
+            <div class="selection-grid two-cols">
+              <div class="selection-card"
+                   [class.selected]="!dto.muon_tao_tra_phi"
+                   (click)="dto.muon_tao_tra_phi = false">
+                <div class="check-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="card-icon green"><i class="fas fa-gift"></i></div>
+                <div class="card-info">
+                  <h4>Miễn phí</h4>
+                  <p>Không thu phí người tham gia.</p>
+                </div>
+              </div>
+              <div class="selection-card"
+                   [class.selected]="dto.muon_tao_tra_phi"
+                   (click)="dto.muon_tao_tra_phi = true">
+                <div class="check-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="card-icon orange"><i class="fas fa-coins"></i></div>
+                <div class="card-info">
+                  <h4>Trả phí (Premium)</h4>
+                  <p>Thu phí vàng khi mở khóa.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card-footer">
+          <button type="button" class="btn-cancel" (click)="cancel()">Hủy bỏ</button>
+          <button type="submit" class="btn-submit" [disabled]="saving || editForm.invalid">
+            @if (saving) {
+              <i class="fas fa-spinner fa-spin"></i> Đang lưu...
+            } @else {
+              <i class="fas fa-save"></i> Lưu thay đổi
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+} @else {
+  <div class="loading-screen">
+    <div class="spinner"></div>
+    <p>Đang tải dữ liệu...</p>
+  </div>
+}

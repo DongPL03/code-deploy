@@ -1,0 +1,255 @@
+<div class="leaderboard-page">
+  <div class="bg-decor-1"></div>
+  <div class="bg-decor-2"></div>
+
+  <div class="lb-container">
+
+    <header class="lb-header animate-fade-down">
+      <div class="header-content">
+        <div class="trophy-box">
+          <span class="emoji-trophy">🏆</span>
+        </div>
+        <div class="text-group">
+          <h1>ĐẤU TRƯỜNG DANH VỌNG</h1>
+          <p>Vinh danh những huyền thoại tri thức</p>
+        </div>
+      </div>
+
+      <div class="filters-bar">
+        <div class="pill-group">
+          <button class="pill-btn" [class.active]="time_range === 'ALL'" (click)="setTimeRange('ALL')">
+            Toàn thời gian
+          </button>
+          <button class="pill-btn" [class.active]="time_range === 'MONTH'" (click)="setTimeRange('MONTH')">
+            Tháng này
+          </button>
+          <button class="pill-btn" [class.active]="time_range === 'WEEK'" (click)="setTimeRange('WEEK')">
+            Tuần này
+          </button>
+        </div>
+
+        <div class="filter-select-wrapper">
+          <select [(ngModel)]="selected_chu_de_id" (change)="loadPage(0)" class="glass-select">
+            <option [ngValue]="undefined">🌐 Tất cả chủ đề</option>
+            @for (c of chu_de_options; track c.id) {
+              <option [ngValue]="c.id">{{ c.ten }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </header>
+
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner-3d"></div>
+        <p>Đang tổng hợp dữ liệu...</p>
+      </div>
+    } @else {
+
+      @if (items.length === 0) {
+        <div class="empty-state animate-fade-up">
+          <img src="assets/images/empty-rank.png" alt="Empty" onerror="this.style.display='none'">
+          <h3>Chưa có dữ liệu xếp hạng</h3>
+          <p>Hãy là người đầu tiên ghi danh trên bảng vàng!</p>
+        </div>
+      } @else {
+
+        <div class="podium-section animate-scale-up">
+
+          @if (items[1]) {
+            <div class="podium-col rank-2" (click)="openUserModal(items[1])">
+              <div class="player-info">
+                <div class="avatar-frame silver-frame">
+                  <img [src]="getAvatar(items[1])" alt="Rank 2">
+                  <div class="tier-pill silver">{{ mapTierLabel(items[1].rank_tier) }}</div>
+                </div>
+                <div class="p-name">{{ items[1].ho_ten }}</div>
+                <div class="p-score">{{ items[1].tong_diem | number }} <span>PTS</span></div>
+              </div>
+              <div class="podium-block silver-block">
+                <span class="rank-num">2</span>
+              </div>
+            </div>
+          }
+
+          @if (items[0]) {
+            <div class="podium-col rank-1" (click)="openUserModal(items[0])">
+              <div class="crown-vfx">👑</div>
+              <div class="player-info">
+                <div class="avatar-frame gold-frame">
+                  <img [src]="getAvatar(items[0])" alt="Rank 1">
+                  <div class="tier-pill gold">{{ mapTierLabel(items[0].rank_tier) }}</div>
+                </div>
+                <div class="p-name big">{{ items[0].ho_ten }}</div>
+                <div class="p-score big">{{ items[0].tong_diem | number }} <span>PTS</span></div>
+              </div>
+              <div class="podium-block gold-block">
+                <div class="shine"></div>
+                <span class="rank-num">1</span>
+              </div>
+            </div>
+          }
+
+          @if (items[2]) {
+            <div class="podium-col rank-3" (click)="openUserModal(items[2])">
+              <div class="player-info">
+                <div class="avatar-frame bronze-frame">
+                  <img [src]="getAvatar(items[2])" alt="Rank 3">
+                  <div class="tier-pill bronze">{{ mapTierLabel(items[2].rank_tier) }}</div>
+                </div>
+                <div class="p-name">{{ items[2].ho_ten }}</div>
+                <div class="p-score">{{ items[2].tong_diem | number }} <span>PTS</span></div>
+              </div>
+              <div class="podium-block bronze-block">
+                <span class="rank-num">3</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="ranking-list animate-fade-up">
+          <div class="list-header">
+            <div class="col-rank">#</div>
+            <div class="col-info">Chiến binh</div>
+            <div class="col-stat center">Trận đấu</div>
+            <div class="col-stat center">Thắng/Thua</div>
+            <div class="col-score end">Điểm số</div>
+          </div>
+
+          @for (item of items; track item.user_id) {
+            <div class="rank-card" (click)="openUserModal(item)" [class.me]="item.user_id === me?.id">
+              <div class="col-rank">
+                <span class="rank-chip">#{{ item.xep_hang }}</span>
+              </div>
+
+              <div class="col-info">
+                <img [src]="getAvatar(item)" class="list-avatar" alt="Avatar">
+                <div class="u-meta">
+                  <span class="u-name">{{ item.ho_ten }}</span>
+                  <span class="u-tier">{{ mapTierLabel(item.rank_tier) }}</span>
+                </div>
+              </div>
+
+              <div class="col-stat center font-bold">{{ item.tong_tran }}</div>
+
+              <div class="col-stat center">
+                <span class="c-win">{{ item.so_tran_thang }}</span> / <span
+                class="c-lose">{{ item.so_tran_thua }}</span>
+              </div>
+
+              <div class="col-score end">
+                {{ item.tong_diem | number }}
+              </div>
+            </div>
+          }
+
+          @if (totalPages > 1) {
+            <div class="pagination-glass">
+              <button (click)="goToPage(page - 1)" [disabled]="page <= 0">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <span>Trang {{ page + 1 }} / {{ totalPages }}</span>
+              <button (click)="goToPage(page + 1)" [disabled]="page + 1 >= totalPages">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  @if (show_user_modal) {
+    <div class="modal-backdrop fade-in" (click)="closeUserModal()">
+      <div class="modal-glass scale-in" (click)="$event.stopPropagation()">
+
+        <button class="btn-close" (click)="closeUserModal()">
+          <i class="fas fa-times"></i>
+        </button>
+
+        @if (user_loading) {
+          <div class="modal-loading">
+            <div class="spinner-3d"></div>
+            <p>Đang tải thông tin...</p>
+          </div>
+        } @else if (user_summary) {
+
+          <div class="modal-hero">
+            <div class="hero-avatar-wrapper">
+              <img [src]="getProfileImage(user_summary?.avatar_url)"
+                   class="hero-avatar">
+              <div class="level-badge">Lv.{{ user_summary.level }}</div>
+            </div>
+            <div class="hero-info">
+              <h2>{{ user_summary.ho_ten }}</h2>
+              <span class="hero-tier" [ngClass]="(user_summary.rank_tier || '').toLowerCase()">
+                {{ mapTierLabel(user_summary.rank_tier) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="icon-stat">🏆</div>
+              <div class="stat-content">
+                <small>Tổng điểm</small>
+                <strong class="text-primary">{{ user_summary.tong_diem | number }}</strong>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="icon-stat">⚔️</div>
+              <div class="stat-content">
+                <small>Thắng/Thua</small>
+                <strong><span class="text-green">{{ user_summary.so_tran_thang }}</span>/<span
+                  class="text-red">{{ user_summary.so_tran_thua }}</span></strong>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="icon-stat">🔥</div>
+              <div class="stat-content">
+                <small>Tỉ lệ thắng</small>
+                <strong>{{ user_summary.ti_le_thang | percent:'1.0-0' }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="history-section">
+            <h3><i class="fas fa-history"></i> Lịch sử đấu gần đây</h3>
+            <div class="history-list">
+              @if (user_history_loading) {
+                <div class="mini-spinner"></div>
+              } @else if (user_history_items.length === 0) {
+                <div class="empty-history">Chưa có trận đấu nào.</div>
+              } @else {
+                @for (h of user_history_items; track $index) {
+                  <div class="history-row">
+                    <div class="h-icon" [class.win]="h.xep_hang === 1">
+                      {{ h.xep_hang === 1 ? '👑' : '#' + h.xep_hang }}
+                    </div>
+                    <div class="h-info">
+                      <div class="h-room">{{ h.ten_phong }}</div>
+                      <div class="h-time">{{ h.hoan_thanh_luc | date:'dd/MM HH:mm' }}</div>
+                    </div>
+                    <div class="h-stats">
+                      <span class="h-score">+{{ h.tong_diem }} pts</span>
+                      <span class="h-correct"><i class="fas fa-check"></i> {{ h.so_cau_dung }}</span>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            @if (user_summary.user_id !== me?.id) {
+              <button class="btn-full-profile" [routerLink]="['/nguoi-choi', user_summary.user_id]">
+                Xem hồ sơ chi tiết <i class="fas fa-arrow-right"></i>
+              </button>
+            }
+          </div>
+
+        }
+      </div>
+    </div>
+  }
+</div>

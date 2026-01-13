@@ -1,0 +1,218 @@
+version: "3.8"
+
+services:
+  # --- 1. Database MySQL ---
+  mysql-container:
+    image: mysql:8.0
+    container_name: mysql-dautruong
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: dongle170503 # Khớp với application.yml
+      MYSQL_DATABASE: dau_truong_tri_thuc # Khớp với application.yml
+    ports:
+      - "3307:3306" # Map ra cổng 3307 để tránh đụng MySQL cài sẵn trên máy
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # QUAN TRỌNG: Tự động chạy file SQL để tạo bảng khi khởi động lần đầu
+      # Hãy tạo thư mục 'sql' và để file .sql của bạn vào đó
+      - ./sql:/docker-entrypoint-initdb.d
+    networks:
+      - dautruong-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    # ========== Resource Limits cho VPS 4GB ==========
+    deploy:
+      resources:
+        limits:
+          memory: 1280M # MySQL max 1.25GB
+        reservations:
+          memory: 512M # Đảm bảo ít nhất 512MB
+    # MySQL tuning cho VPS 4GB
+    command: >
+      --innodb-buffer-pool-size=768M
+      --max-connections=100
+      --innodb-log-file-size=64M
+      --innodb-flush-method=O_DIRECT
+      --performance-schema=OFF
+
+  # --- 2. Redis Cache ---
+  redis-container:
+    image: redis:alpine
+    container_name: redis-dautruong
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - dautruong-network
+    # ========== Resource Limits ==========
+    deploy:
+      resources:
+        limits:
+          memory: 256M # Redis max 256MB
+        reservations:
+          memory: 64M
+    # Redis tuning - giới hạn memory và eviction policy
+    command: redis-server --maxmemory 200mb --maxmemory-policy allkeys-lru
+
+  # --- 3. Backend (Spring Boot) ---
+  spring-app-container:
+    container_name: spring-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "8088:8088"
+    environment:
+      # Cấu hình Database (Trỏ vào tên service mysql-container)
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/dau_truong_tri_thuc?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+
+      # Cấu hình Redis (Trỏ vào tên service redis-container)
+      REDIS_HOST: redis-container
+      REDIS_PORT: 6379
+
+      # Cấu hình JWT (Lấy từ biến môi trường của máy hoặc điền trực tiếp vào đây)
+      # VÍ DỤ: Hãy thay chuỗi bên dưới bằng key thật của bạn
+      JWT_SECRET_KEY: "TaqlmGv1iEDMRiFp/pHuID1+T84IABfuA0xXh4GhiUI="
+
+      # ========== CORS Configuration ==========
+      CORS_ALLOWED_ORIGINS: "http://103.200.21.203,http://localhost:4200,http://127.0.0.1:4200"
+
+      # ========== JVM Options cho VPS 4GB ==========
+      JAVA_OPTS: "-Xms512m -Xmx1280m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication"
+
+      # HikariCP tuning cho VPS 4GB
+      HIKARI_MAX_POOL_SIZE: "15"
+      HIKARI_MIN_IDLE: "3"
+
+      # Tắt SQL logging trong production
+      JPA_SHOW_SQL: "false"
+      JPA_FORMAT_SQL: "false"
+      HIBERNATE_STATS: "false"
+
+      # ========== Logging Configuration ==========
+      LOG_LEVEL_ROOT: "INFO"
+      LOG_LEVEL_APP: "INFO"
+      LOG_LEVEL_SPRING_WEB: "WARN"
+      LOG_LEVEL_SPRING_SECURITY: "WARN"
+      LOG_LEVEL_HIBERNATE_SQL: "WARN"
+      LOG_FILE_PATH: "/app/logs/app.log"
+
+      # ========== Response Compression ==========
+      COMPRESSION_ENABLED: "true"
+      TOMCAT_MAX_THREADS: "200"
+      TOMCAT_MIN_SPARE_THREADS: "10"
+      TOMCAT_MAX_CONNECTIONS: "8192"
+
+      # ========== Actuator Health Check ==========
+      ACTUATOR_ENDPOINTS: "health,info,metrics"
+      HEALTH_SHOW_DETAILS: "when-authorized"
+
+      # ========== Async Thread Pool cho VPS 4GB (2 vCPU) ==========
+      ASYNC_CORE_POOL_SIZE: "4"
+      ASYNC_MAX_POOL_SIZE: "8"
+      ASYNC_QUEUE_CAPACITY: "100"
+      ASYNC_KEEP_ALIVE_SECONDS: "60"
+
+      # ========== Rate Limiting ==========
+      RATE_LIMIT_ENABLED: "true"
+      # Auth: 5 requests/phút (chống brute-force)
+      RATE_LIMIT_AUTH_CAPACITY: "5"
+      RATE_LIMIT_AUTH_REFILL: "5"
+      RATE_LIMIT_AUTH_REFILL_MINS: "1"
+      # API: 60 requests/phút (general endpoints)
+      RATE_LIMIT_API_CAPACITY: "60"
+      RATE_LIMIT_API_REFILL: "60"
+      RATE_LIMIT_API_REFILL_MINS: "1"
+      # Upload: 10 uploads/5 phút
+      RATE_LIMIT_UPLOAD_CAPACITY: "10"
+      RATE_LIMIT_UPLOAD_REFILL: "10"
+      RATE_LIMIT_UPLOAD_REFILL_MINS: "5"
+
+    volumes:
+      - ./uploads:/app/uploads # Giữ lại ảnh upload khi restart container
+      - ./logs:/app/logs # Lưu logs ra ngoài để dễ truy cập
+    depends_on:
+      mysql-container:
+        condition: service_healthy
+      redis-container:
+        condition: service_started
+    networks:
+      - dautruong-network
+    # ========== Health Check ==========
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s # Đợi 60s để app khởi động
+    # ========== Resource Limits ==========
+    deploy:
+      resources:
+        limits:
+          memory: 1536M # Spring Boot max 1.5GB
+        reservations:
+          memory: 768M # Đảm bảo ít nhất 768MB
+
+  # --- 4. phpMyAdmin (Tùy chọn - để xem DB cho tiện) ---
+  # ⚠️ Nên TẮT trên production để tiết kiệm RAM và bảo mật
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-dautruong
+    depends_on:
+      - mysql-container
+    ports:
+      - "8000:80" # Truy cập tại http://localhost:8000
+    environment:
+      PMA_HOST: mysql-container
+      PMA_PORT: 3306
+    networks:
+      - dautruong-network
+    # ========== Resource Limits ==========
+    deploy:
+      resources:
+        limits:
+          memory: 128M # phpMyAdmin max 128MB
+    # Tắt trên production bằng cách comment hoặc thêm profile
+    profiles:
+      - dev # Chỉ chạy khi: docker-compose --profile dev up
+
+  # --- 5. Frontend (Angular + Nginx) ---
+  frontend-container:
+    container_name: angular-frontend
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "80:80" # Production port
+    depends_on:
+      - spring-app-container
+    networks:
+      - dautruong-network
+    # ========== Resource Limits ==========
+    deploy:
+      resources:
+        limits:
+          memory: 128M # Nginx rất nhẹ
+        reservations:
+          memory: 32M
+    # ========== Health Check ==========
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  dautruong-network:
+    driver: bridge

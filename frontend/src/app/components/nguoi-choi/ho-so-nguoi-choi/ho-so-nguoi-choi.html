@@ -1,0 +1,151 @@
+<div class="profile-page">
+  <div class="bg-decor-1"></div>
+  <div class="bg-decor-2"></div>
+
+  <div class="profile-container animate-fade-down">
+
+    @if (summary) {
+      <div class="hero-card">
+        <div class="hero-content">
+          <div class="avatar-wrapper">
+            <div class="avatar-ring">
+              <img [src]="getAvatar(summary)" class="avatar-img">
+            </div>
+            <div class="level-badge">Lv.{{ summary.level || 1 }}</div>
+          </div>
+
+          <div class="user-details">
+            <div class="user-meta">
+              <h1 class="user-name">{{ summary.ho_ten }}</h1>
+              <span class="user-id">ID: {{ summary.user_id }}</span>
+            </div>
+
+            <div class="rank-badge-container">
+              <span class="rank-badge" [ngClass]="(summary.rank_tier || '').toLowerCase()">
+                <i class="fas fa-medal"></i> {{ mapTierLabel(summary.rank_tier) }}
+              </span>
+              @if (isMe()) {
+                <span class="me-badge">Đây là bạn</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-pattern"></div>
+      </div>
+
+      <div class="stats-grid animate-scale-up">
+
+        <div class="stat-card primary">
+          <div class="icon-box">🏆</div>
+          <div class="stat-info">
+            <span class="label">Tổng điểm</span>
+            <span class="value">{{ summary.tong_diem | number }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card info">
+          <div class="icon-box">⚔️</div>
+          <div class="stat-info">
+            <span class="label">Tham chiến</span>
+            <span class="value">{{ summary.tong_tran }} <small>trận</small></span>
+          </div>
+        </div>
+
+        <div class="stat-card success">
+          <div class="icon-box">🔥</div>
+          <div class="stat-info">
+            <span class="label">Thắng / Thua</span>
+            <span class="value">
+              <span class="win">{{ summary.so_tran_thang }}</span> / <span
+              class="lose">{{ summary.so_tran_thua }}</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="stat-card warning">
+          <div class="icon-box">⚡</div>
+          <div class="stat-info">
+            <span class="label">Tỉ lệ thắng</span>
+            <span class="value">{{ summary.ti_le_thang | percent:'1.0-1' }}</span>
+          </div>
+        </div>
+      </div>
+
+    } @else {
+      <div class="loading-state">
+        <div class="spinner-3d"></div>
+        <p>Đang triệu hồi hồ sơ...</p>
+      </div>
+    }
+
+    <div class="history-section animate-fade-up">
+      <div class="section-header">
+        <h2><i class="fas fa-history"></i> Nhật Ký Chiến Trường</h2>
+      </div>
+
+      @if (loading_history) {
+        <div class="loading-mini">
+          <div class="spinner-sm"></div>
+          Đang tải lịch sử...
+        </div>
+      } @else {
+        @if (history_items.length > 0) {
+          <div class="battle-list">
+            @for (h of history_items; track $index) {
+              <div class="battle-card" [class.top-1]="h.xep_hang === 1">
+
+                <div class="battle-rank">
+                  @if (h.xep_hang === 1) {
+                    <div class="rank-icon gold">👑</div>
+                  } @else if (h.xep_hang === 2) {
+                    <div class="rank-icon silver">🥈</div>
+                  } @else if (h.xep_hang === 3) {
+                    <div class="rank-icon bronze">🥉</div>
+                  } @else {
+                    <div class="rank-text">#{{ h.xep_hang }}</div>
+                  }
+                </div>
+
+                <div class="battle-info">
+                  <div class="room-name">{{ h.ten_phong }}</div>
+                  <div class="quiz-name">
+                    <i class="fas fa-book-open"></i> {{ h.bo_cau_hoi_tieu_de }}
+                  </div>
+                  <div class="battle-time">{{ h.hoan_thanh_luc | date:'dd/MM/yyyy HH:mm' }}</div>
+                </div>
+
+                <div class="battle-stats">
+                  <div class="b-score">+{{ h.tong_diem }} <span>PTS</span></div>
+                  <div class="b-correct">
+                    <i class="fas fa-check-circle"></i> {{ h.so_cau_dung }} câu đúng
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          @if (history_total_pages > 1) {
+            <div class="pagination-glass">
+              <button (click)="changeHistoryPage(history_page - 1)" [disabled]="history_page <= 0">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <span>Trang {{ history_page + 1 }} / {{ history_total_pages }}</span>
+              <button (click)="changeHistoryPage(history_page + 1)"
+                      [disabled]="history_page + 1 >= history_total_pages">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          }
+
+        } @else {
+          <div class="empty-state">
+            <img src="assets/images/empty-history.png" onerror="this.style.display='none'">
+            <p>Chiến binh này chưa tham gia trận đấu nào.</p>
+          </div>
+        }
+      }
+    </div>
+
+  </div>
+</div>
