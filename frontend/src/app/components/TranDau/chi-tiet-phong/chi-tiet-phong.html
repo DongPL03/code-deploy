@@ -18,7 +18,15 @@
         <div class="title">
           <h1>{{ pageTitle() }}</h1>
           <span class="code">#{{ battle()?.ma_phong }}</span>
-          <span [class]="badgeClass(status())">{{ status() }}</span>
+          <span [class]="badgeClass(status())">
+            @if (status() === 'CHO') {
+              Chờ bắt đầu
+            } @else if (status() === 'DANG_CHOI') {
+              Đang diễn ra
+            } @else if (status() === 'HOAN_THANH') {
+              Kết thúc
+            }
+          </span>
         </div>
         <div class="meta">
           <div>
@@ -410,47 +418,53 @@
                 </div>
               </section>
             }
+            @if (isOngoing() || isFinished()) {
+              <section class="leaderboard sidebar-mode animate-fade-in">
+                <div class="lb-header">
+                  <h3><i class="fas fa-trophy"></i> Bảng Xếp Hạng</h3>
+                </div>
 
-            @if (leaderboard().length > 0) {
-              <section class="leaderboard">
-                <h3><i class="fas fa-trophy"></i> Top Xếp hạng</h3>
-                <table class="ranking">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Tên</th>
-                    <th>Điểm</th>
-                    <th>Đúng</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                    @for (p of leaderboard(); track p.user_id) {
-                      <tr [class.left-player]="p.da_roi"
-                          [class.is-me]="p.user_id === finalResult?.myId">
-                        <td>
+                <div class="lb-scroll-wrap">
+                  <table class="ranking">
+                    <thead>
+                    <tr>
+                      <th style="width: 30px">#</th>
+                      <th>Tên</th>
+                      <th style="text-align: right">Điểm</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      @for (p of leaderboard().slice(0, 10); track p.user_id) {
+                        <tr [class.left-player]="p.da_roi"
+                            [class.is-me]="p.user_id === finalResult?.myId"
+                            class="rank-row">
+                          <td>
                   <span class="rank-chip"
-                        [class.top1]="p.xep_hang === 1">{{
-                      p.xep_hang
-                    }}</span>
-                        </td>
-                        <td>
-                          {{ p.ho_ten }}
-                          @if (p.da_roi) {
-                            <span class="tag-left"
-                                  style="font-size: 0.8em; color: #999;">(đã
-                    rời)</span>
-                          }
-                        </td>
-                        <td><strong>{{ p.diem }}</strong></td>
-                        <td>{{ p.so_cau_dung }}</td>
-                      </tr>
-                    } @empty {
-                      <tr>
-                        <td colspan="4">Chưa có dữ liệu xếp hạng.</td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
+                        [class.top1]="p.xep_hang === 1"
+                        [class.top2]="p.xep_hang === 2"
+                        [class.top3]="p.xep_hang === 3">
+                    {{ p.xep_hang }}
+                  </span>
+                          </td>
+                          <td>
+                            <div class="name-cell">
+                              <span class="truncate">{{ p.ho_ten }}</span>
+                            </div>
+                          </td>
+                          <td style="text-align: right">
+                            <strong>{{ p.diem }}</strong>
+                          </td>
+                        </tr>
+                      } @empty {
+                        <tr>
+                          <td colspan="3" style="text-align:center; padding: 20px; color: #999;">
+                            ...
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
               </section>
             }
 
@@ -712,3 +726,4 @@
     </div>
   </div>
 }
+

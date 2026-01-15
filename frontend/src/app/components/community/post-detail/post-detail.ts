@@ -197,9 +197,7 @@ export class PostDetailComponent extends Base implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.isSubmittingComment = false;
-          console.log(response);
           if (response.status === 'CREATED' && response.data) {
-            // Reload only comments - much lighter than loadPost
             this.loadComments(this.post!.id);
             if (this.post) {
               this.post.soLuotBinhLuan++;
@@ -249,7 +247,7 @@ export class PostDetailComponent extends Base implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          if (response.status === 'OK' && response.data) {
+          if (response.status === 'CREATED' && response.data) {
             // Reload comments from server to get full data including reply
             this.loadComments(postId);
             if (this.post) {
@@ -290,7 +288,7 @@ export class PostDetailComponent extends Base implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          if (response.status === 'OK') {
+          if (response.status === 'CREATED') {
             comment.noiDung = this.editContent.trim();
             comment.daSua = true;
             this.cancelEditComment();
@@ -329,6 +327,7 @@ export class PostDetailComponent extends Base implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
+          console.log(response.status);
           if (response.status === 'OK') {
             comment.daThich = !comment.daThich;
             comment.soLuotThich += comment.daThich ? 1 : -1;

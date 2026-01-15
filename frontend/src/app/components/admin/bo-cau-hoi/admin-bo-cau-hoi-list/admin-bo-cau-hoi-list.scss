@@ -622,3 +622,188 @@
     transform: translateY(0);
   }
 }
+/* --- CUSTOM DROPDOWN STYLE --- */
+.custom-dropdown-container {
+  position: relative;
+  min-width: 160px; /* Độ rộng tối thiểu cho đẹp */
+}
+
+.dropdown-trigger {
+  width: 100%;
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  height: 42px; /* Chiều cao đồng bộ với search box */
+}
+
+.dropdown-trigger:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(108, 93, 211, 0.05);
+}
+
+.selected-text {
+  font-size: 0.9rem;
+  color: #1E293B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 10px;
+}
+
+.arrow {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  transition: transform 0.3s;
+}
+
+.arrow.rotate {
+  transform: rotate(180deg);
+}
+
+/* Danh sách xổ xuống */
+.dropdown-options-list {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid var(--border);
+  min-width: 100%; /* Đảm bảo không bị bé hơn trigger */
+}
+
+.dropdown-options-list::-webkit-scrollbar {
+  width: 5px;
+}
+.dropdown-options-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #475569;
+  transition: 0.2s;
+}
+
+.dropdown-item:hover {
+  background: var(--purple-light);
+  color: var(--primary);
+}
+
+.dropdown-item.active {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.backdrop-click {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  cursor: default;
+  background: transparent;
+}
+
+.animate-fade-down {
+  animation: fadeDownSelect 0.2s ease-out;
+}
+
+@keyframes fadeDownSelect {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 992px) {
+  .admin-bch-container {
+    padding: 15px;
+    padding-bottom: 100px; /* Tránh bị che nếu có bottom menu */
+  }
+
+  /* 1. Header */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .btn-create {
+    width: 100%; /* Nút tạo full width */
+    justify-content: center;
+  }
+
+  /* 2. Stats Grid */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr; /* 2 cột trên mobile */
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 15px;
+    flex-direction: column; /* Icon trên, số dưới */
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  /* 3. Toolbar (Quan trọng) */
+  .toolbar {
+    flex-direction: column;
+  }
+
+  .toolbar-left {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100%;
+    min-width: unset;
+  }
+
+  /* Dropdown trên mobile full width */
+  .custom-dropdown-container {
+    width: 100%;
+  }
+
+  .btn-icon-text {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Nút reset */
+  .reset-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* 4. Table Scroll */
+  .table-card {
+    overflow-x: auto; /* Cho phép cuộn ngang bảng */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modern-table {
+    min-width: 800px; /* Đảm bảo bảng không bị co dúm */
+  }
+
+  /* Ẩn bớt cột không quan trọng trên mobile nếu cần */
+  /* .modern-table th:nth-child(4), .modern-table td:nth-child(4) { display: none; } */
+}

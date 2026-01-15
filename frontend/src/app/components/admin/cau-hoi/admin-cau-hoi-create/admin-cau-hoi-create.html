@@ -105,7 +105,6 @@
 
       <div class="form-section">
         <h3 class="section-title"><i class="fas fa-sliders-h"></i> 3. Cấu hình bổ sung</h3>
-
         <div class="config-row">
           <div class="form-group flex-2">
             <label>Giải thích chi tiết (Hiện khi xem kết quả)</label>
@@ -115,11 +114,34 @@
 
           <div class="form-group flex-1">
             <label>Độ khó</label>
-            <select [(ngModel)]="model.do_kho" name="do_kho" class="form-select">
-              <option value="DE">🟢 Dễ</option>
-              <option value="TRUNG_BINH">🟡 Trung bình</option>
-              <option value="KHO">🔴 Khó</option>
-            </select>
+
+            <div class="custom-dropdown-container">
+              <div class="dropdown-trigger" (click)="toggleDifficultyDropdown()">
+                <span class="selected-text">{{ getDifficultyLabel() }}</span>
+                <i class="fas fa-chevron-down arrow-icon" [class.rotate]="showDifficultyDropdown"></i>
+              </div>
+
+              @if (showDifficultyDropdown) {
+                <div class="dropdown-options-list animate-fade-down">
+                  <div class="dropdown-item"
+                       [class.active]="model.do_kho === 'DE'"
+                       (click)="selectDifficulty('DE')">
+                    🟢 Dễ
+                  </div>
+                  <div class="dropdown-item"
+                       [class.active]="model.do_kho === 'TRUNG_BINH'"
+                       (click)="selectDifficulty('TRUNG_BINH')">
+                    🟡 Trung bình
+                  </div>
+                  <div class="dropdown-item"
+                       [class.active]="model.do_kho === 'KHO'"
+                       (click)="selectDifficulty('KHO')">
+                    🔴 Khó
+                  </div>
+                </div>
+                <div class="backdrop-click" (click)="closeDropdown()"></div>
+              }
+            </div>
           </div>
         </div>
       </div>

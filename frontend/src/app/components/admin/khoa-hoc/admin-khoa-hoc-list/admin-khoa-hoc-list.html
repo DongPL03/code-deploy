@@ -78,9 +78,9 @@
           <div class="card-grid">
             @for (khoaHoc of items; track khoaHoc.id) {
               <div class="skill-card" [ngClass]="{
-                'status-published': khoaHoc.trang_thai === 'PUBLISHED',
-                'status-draft': khoaHoc.trang_thai === 'DRAFT',
-                'status-archived': khoaHoc.trang_thai === 'ARCHIVED'
+                'status-published': khoaHoc.trang_thai === 'CONG_KHAI',
+                'status-draft': khoaHoc.trang_thai === 'BAN_NHAP',
+                'status-archived': khoaHoc.trang_thai === 'LUU_TRU'
               }">
                 <div class="card-top">
                   <div class="icon-box">
@@ -88,11 +88,11 @@
                   </div>
                   <div class="badges-stack">
                     <span class="badge-pill status-badge">
-                      @if (khoaHoc.trang_thai === 'PUBLISHED') {
+                      @if (khoaHoc.trang_thai === 'CONG_KHAI') {
                         <i class="fas fa-check-circle"></i> Đã xuất bản
-                      } @else if (khoaHoc.trang_thai === 'DRAFT') {
+                      } @else if (khoaHoc.trang_thai === 'BAN_NHAP') {
                         <i class="fas fa-edit"></i> Bản nháp
-                      } @else if (khoaHoc.trang_thai === 'ARCHIVED') {
+                      } @else if (khoaHoc.trang_thai === 'LUU_TRU') {
                         <i class="fas fa-archive"></i> Đã lưu trữ
                       }
                     </span>

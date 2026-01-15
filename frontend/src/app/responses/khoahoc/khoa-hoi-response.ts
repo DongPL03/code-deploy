@@ -7,7 +7,7 @@ export interface KhoaHoiResponse {
   chu_de_id?: number;
   nguoi_tao?: string;
   nguoi_tao_id?: number;
-  trang_thai?: string; // DRAFT, PUBLISHED, ARCHIVED
+  trang_thai?: string;
   gia_mo_khoa?: number;
   thu_tu?: number;
   so_bo_cau_hoi?: number;

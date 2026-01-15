@@ -41,6 +41,8 @@ export class BangXepHang extends Base implements OnInit {
 
   readonly imageBaseURL = `${environment.apiBaseUrl}/users/profile-images/`;
 
+  showChuDeDropdown: boolean = false;
+
   ngOnInit() {
     this.loadChuDe();
     this.loadPage(0);
@@ -169,6 +171,24 @@ export class BangXepHang extends Base implements OnInit {
       return this.imageBaseURL + filename;
     }
     return 'assets/images/default-avatar.png';
+  }
+
+  toggleChuDeDropdown() {
+    this.showChuDeDropdown = !this.showChuDeDropdown;
+  }
+
+  selectChuDe(id: number | undefined) {
+    this.selected_chu_de_id = id;
+    this.showChuDeDropdown = false; // Đóng menu
+    this.loadPage(0); // Tải lại dữ liệu trang 0
+  }
+
+  getSelectedChuDeName(): string {
+    if (!this.selected_chu_de_id) {
+      return '🌐 Tất cả chủ đề';
+    }
+    const selected = this.chu_de_options.find(c => c.id === this.selected_chu_de_id);
+    return selected ? selected.ten : 'Chọn chủ đề';
   }
 }
 

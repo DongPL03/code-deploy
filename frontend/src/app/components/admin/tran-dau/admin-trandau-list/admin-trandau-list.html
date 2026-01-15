@@ -237,7 +237,9 @@
             <div class="player-list custom-scrollbar">
               @for (p of roomDetail.nguoi_choi; track p.id) {
                 <div class="player-item">
-                  <img [src]="p.avatar || 'assets/images/default-avatar.png'" class="p-avt">
+                  <img
+                    [src]="getAvatar(p.avatar, p.ho_ten)"
+                    class="p-avt">
                   <div class="p-info">
                     <span class="p-name">{{ p.ho_ten }}</span>
                     @if (p.is_host) {

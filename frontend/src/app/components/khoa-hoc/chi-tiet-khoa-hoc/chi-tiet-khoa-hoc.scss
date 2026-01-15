@@ -545,3 +545,143 @@
     font-size: 16px;
   }
 }
+
+/* --- MOBILE RESPONSIVE FIX (CHI TIẾT KHÓA HỌC) --- */
+@media (max-width: 992px) {
+  /* 1. Container chính: Thêm khoảng thở dưới đáy để né Bottom Menu */
+  .course-detail-container {
+    padding: 16px;
+    padding-bottom: 110px !important; /* QUAN TRỌNG: Né menu dưới */
+  }
+
+  /* 2. Header: Căn giữa, xếp chồng */
+  .course-header {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header-content h1 {
+    font-size: 1.6rem; /* Giảm cỡ chữ tiêu đề */
+    line-height: 1.3;
+  }
+
+  .course-meta {
+    flex-direction: column; /* Xếp thông tin (Tác giả, chủ đề) dọc xuống */
+    gap: 8px;
+    margin-top: 5px;
+  }
+
+  /* 3. Phần Mở Khóa (Đang bị vỡ): Chuyển sang dọc */
+  .unlock-course-content {
+    flex-direction: column; /* Icon trên, chữ dưới */
+    text-align: center;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .unlock-icon {
+    font-size: 2.5rem; /* Thu nhỏ icon chút */
+  }
+
+  .unlock-text p {
+    font-size: 0.95rem;
+  }
+
+  /* Nút mở khóa to rõ, dễ bấm */
+  .btn-unlock-course {
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 15px;
+  }
+
+  /* 4. Lộ trình (Path Items) */
+  .path-item {
+    flex-direction: column; /* Số thứ tự lên trên, card xuống dưới */
+    gap: 15px;
+    margin-bottom: 35px; /* Tăng khoảng cách giữa các bài */
+    align-items: center; /* Căn giữa */
+  }
+
+  /* Ẩn đường kẻ nối dọc vì trên mobile nhìn rất rối */
+  .path-connector {
+    display: none;
+  }
+
+  /* Số thứ tự bài học: Đưa lên nằm đè lên góc trái thẻ bài cho đẹp */
+  .step-number {
+    position: absolute;
+    top: -15px;
+    left: 10px;
+    z-index: 5;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    border: 3px solid #fff; /* Viền trắng để nổi bật */
+  }
+
+  /* Card bài học */
+  .step-card {
+    width: 100%; /* Full chiều rộng */
+    padding: 20px 15px 15px; /* Padding trên to hơn để né số thứ tự */
+    margin-top: 10px;
+  }
+
+  .step-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .step-icon {
+    /* Ẩn icon bài học to đùng đi cho đỡ chật, hoặc thu nhỏ lại */
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    display: none; /* Tạm ẩn đi cho thoáng, nếu thích hiện thì xóa dòng này */
+  }
+
+  .step-info h3 {
+    font-size: 1.1rem;
+    margin-left: 35px; /* Thụt vào để né cái số thứ tự đang đè lên */
+  }
+
+  .step-meta {
+    flex-direction: column;
+    gap: 5px;
+    margin-left: 0;
+  }
+
+  .step-status {
+    width: 100%;
+    text-align: right;
+    margin-top: -30px; /* Đẩy badge trạng thái lên góc phải */
+  }
+
+  /* Các nút hành động (Luyện tập, Xem chi tiết) */
+  .step-actions {
+    flex-direction: column; /* Xếp dọc */
+    width: 100%;
+    margin-top: 15px;
+    gap: 10px;
+  }
+
+  .btn {
+    width: 100%; /* Nút full chiều ngang để dễ bấm bằng ngón cái */
+    justify-content: center;
+    padding: 12px;
+  }
+
+  /* 5. Phân tích học tập (Analysis) */
+  .analysis-columns {
+    flex-direction: column; /* Xếp cột điểm mạnh/yếu dọc xuống */
+    gap: 20px;
+  }
+
+  .analysis-column {
+    background: #f8f9fb;
+    padding: 15px;
+    border-radius: 12px;
+  }
+}

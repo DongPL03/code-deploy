@@ -15,77 +15,87 @@
     </header>
     <div class="inventory-layout">
       <aside class="control-panel">
-        <div class="panel-header">
-          <i class="fas fa-sliders-h"></i> Bộ Lọc
-        </div>
-
-        <div class="filter-group">
-          <div class="search-hud">
-            <i class="fas fa-search"></i>
-            <input [(ngModel)]="keyword"
-                   (keyup.enter)="applyFilter()"
-                   placeholder="Tìm kiếm khóa học..."/>
+        <div class="panel-header" (click)="toggleMobileFilter()">
+          <div class="panel-title">
+            <i class="fas fa-sliders-h"></i> Bộ Lọc
           </div>
+          <i class="fas fa-chevron-down mobile-toggle-icon"
+             [class.rotate]="isMobileFilterOpen"></i>
         </div>
 
-        <div class="filter-group">
-          <label class="group-label">Sắp xếp</label>
-          <div class="select-wrapper">
-            <select [(ngModel)]="sortOrder"
-                    (change)="applyFilter()"
-                    class="custom-select">
-              <option value="NEWEST">🕐 Mới nhất</option>
-              <option value="OLDEST">📅 Cũ nhất</option>
-              <option value="RATING_DESC">⭐ Đánh giá cao nhất</option>
-              <option value="RATING_ASC">⭐ Đánh giá thấp nhất</option>
-            </select>
-            <i class="fas fa-chevron-down arrow"></i>
+        <div class="filter-content" [class.show-mobile]="isMobileFilterOpen">
+
+          <div class="filter-group">
+            <div class="search-hud">
+              <i class="fas fa-search"></i>
+              <input [(ngModel)]="keyword" (keyup.enter)="applyFilter()"
+                     placeholder="Tìm kiếm..." />
+            </div>
           </div>
-        </div>
 
-        <div class="filter-group">
-          <label class="group-label">Chủ đề</label>
-          <div class="select-wrapper">
-            <select [(ngModel)]="chuDeId"
-                    (change)="applyFilter()"
-                    class="custom-select">
-              <option [value]="0">📚 Tất cả chủ đề</option>
-              @for (cd of chuDes; track cd.id) {
-                <option [value]="cd.id">{{ cd.ten }}</option>
+          <div class="filter-group">
+            <label class="group-label">Sắp xếp</label>
+            <div class="custom-dropdown-container">
+              <div class="dropdown-trigger" (click)="toggleSortDropdown()">
+                <span class="selected-text">{{ getSortLabel() }}</span>
+                <i class="fas fa-chevron-down arrow" [class.rotate]="showSortDropdown"></i>
+              </div>
+
+              @if (showSortDropdown) {
+                <div class="dropdown-options-list animate-fade-down">
+                  <div class="dropdown-item" [class.active]="sortOrder === 'NEWEST'" (click)="selectSort('NEWEST')">🕐 Mới nhất</div>
+                  <div class="dropdown-item" [class.active]="sortOrder === 'OLDEST'" (click)="selectSort('OLDEST')">📅 Cũ nhất</div>
+                  <div class="dropdown-item" [class.active]="sortOrder === 'RATING_DESC'" (click)="selectSort('RATING_DESC')">⭐ Đánh giá cao</div>
+                  <div class="dropdown-item" [class.active]="sortOrder === 'RATING_ASC'" (click)="selectSort('RATING_ASC')">⭐ Đánh giá thấp</div>
+                </div>
+                <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
               }
-            </select>
-            <i class="fas fa-chevron-down arrow"></i>
+            </div>
           </div>
-        </div>
 
-        <div class="filter-group">
-          <label class="group-label">Trạng thái</label>
-          <div class="select-wrapper">
-            <select [(ngModel)]="trangThai"
-                    (change)="applyFilter()"
-                    class="custom-select">
-              @for (opt of trangThaiOptions; track
-                opt.value) {
-                <option [value]="opt.value">{{ opt.label }}
-                </option>
-              }
-            </select>
-            <i class="fas fa-chevron-down arrow"></i>
-          </div>
-        </div>
+          <div class="filter-group">
+            <label class="group-label">Chủ đề</label>
+            <div class="custom-dropdown-container">
+              <div class="dropdown-trigger" (click)="toggleChuDeDropdown()">
+                <span class="selected-text">{{ getChuDeLabel() }}</span>
+                <i class="fas fa-chevron-down arrow" [class.rotate]="showChuDeDropdown"></i>
+              </div>
 
-        <div class="filter-group">
-          <label class="group-label">Đánh giá</label>
-          <div class="select-wrapper">
-            <select [(ngModel)]="minRating"
-                    (change)="applyFilter()"
-                    class="custom-select">
-              @for (opt of ratingOptions; track opt.value) {
-                <option [ngValue]="opt.value">{{ opt.label }}</option>
+              @if (showChuDeDropdown) {
+                <div class="dropdown-options-list animate-fade-down">
+                  <div class="dropdown-item" [class.active]="chuDeId === 0" (click)="selectChuDe(0)">📚 Tất cả chủ đề</div>
+                  @for (cd of chuDes; track cd.id) {
+                    <div class="dropdown-item" [class.active]="chuDeId === cd.id" (click)="selectChuDe(cd.id)">
+                      {{ cd.ten }}
+                    </div>
+                  }
+                </div>
+                <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
               }
-            </select>
-            <i class="fas fa-chevron-down arrow"></i>
+            </div>
           </div>
+
+          <div class="filter-group">
+            <label class="group-label">Trạng thái</label>
+            <div class="custom-dropdown-container">
+              <div class="dropdown-trigger" (click)="toggleTrangThaiDropdown()">
+                <span class="selected-text">{{ getTrangThaiLabel() }}</span>
+                <i class="fas fa-chevron-down arrow" [class.rotate]="showTrangThaiDropdown"></i>
+              </div>
+
+              @if (showTrangThaiDropdown) {
+                <div class="dropdown-options-list animate-fade-down">
+                  @for (opt of trangThaiOptions; track opt.value) {
+                    <div class="dropdown-item" [class.active]="trangThai === opt.value" (click)="selectTrangThai(opt.value)">
+                      {{ opt.label }}
+                    </div>
+                  }
+                </div>
+                <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
+              }
+            </div>
+          </div>
+
         </div>
       </aside>
 

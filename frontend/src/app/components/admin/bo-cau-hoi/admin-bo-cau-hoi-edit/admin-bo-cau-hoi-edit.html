@@ -15,44 +15,72 @@
 
       <form #editForm="ngForm" (ngSubmit)="onSubmit(editForm)" autocomplete="off">
         <div class="card-body">
-
           <div class="form-section">
             <h3 class="section-title">Thông tin chung</h3>
-
             <div class="form-group">
               <label>Tiêu đề <span class="required">*</span></label>
               <input type="text" name="tieu_de" [(ngModel)]="dto.tieu_de" required maxlength="100" class="form-input"/>
             </div>
-
             <div class="form-group">
               <label>Mô tả ngắn</label>
               <textarea name="mo_ta" [(ngModel)]="dto.mo_ta" rows="3" maxlength="255" class="form-textarea"></textarea>
             </div>
           </div>
 
-          <div class="divider"></div>
-
           <div class="form-row">
             <div class="form-group">
               <label>Chủ đề <span class="required">*</span></label>
-              <select name="chu_de_id" [(ngModel)]="dto.chu_de_id" required class="form-select">
-                @for (c of chu_des; track c.id) {
-                  <option [value]="c.id">{{ c.ten }}</option>
+
+              <div class="custom-dropdown-container">
+                <div class="dropdown-trigger" (click)="toggleChuDeDropdown()">
+        <span class="selected-text" [class.placeholder]="!dto.chu_de_id">
+          {{ getSelectedChuDeName() }}
+        </span>
+                  <i class="fas fa-chevron-down arrow-icon" [class.rotate]="showChuDeDropdown"></i>
+                </div>
+
+                @if (showChuDeDropdown) {
+                  <div class="dropdown-options-list animate-fade-down">
+                    @for (cd of chu_des; track cd.id) {
+                      <div class="dropdown-item"
+                           [class.active]="dto.chu_de_id === cd.id"
+                           (click)="selectChuDe(cd.id)">
+                        {{ cd.ten }}
+                      </div>
+                    }
+                  </div>
+                  <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
                 }
-              </select>
+              </div>
             </div>
 
             <div class="form-group">
               <label>Chế độ hiển thị</label>
-              <select name="che_do_hien_thi" [(ngModel)]="dto.che_do_hien_thi" class="form-select">
-                <option value="PUBLIC">🌍 Công khai</option>
-                <option value="PRIVATE">🔒 Riêng tư</option>
-              </select>
+
+              <div class="custom-dropdown-container">
+                <div class="dropdown-trigger" (click)="toggleCheDoDropdown()">
+                  <span class="selected-text">{{ getSelectedCheDoName() }}</span>
+                  <i class="fas fa-chevron-down arrow-icon" [class.rotate]="showCheDoDropdown"></i>
+                </div>
+
+                @if (showCheDoDropdown) {
+                  <div class="dropdown-options-list animate-fade-down">
+                    <div class="dropdown-item"
+                         [class.active]="dto.che_do_hien_thi === 'RIENG_TU'"
+                         (click)="selectCheDo('RIENG_TU')">
+                      🔒 Private (Dùng để tổ chức thi đấu)
+                    </div>
+                    <div class="dropdown-item"
+                         [class.active]="dto.che_do_hien_thi === 'CONG_KHAI'"
+                         (click)="selectCheDo('CONG_KHAI')">
+                      🌍 Public (Công khai cho mọi người)
+                    </div>
+                  </div>
+                  <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
+                }
+              </div>
             </div>
           </div>
-
-          <div class="divider"></div>
-
           <div class="form-group">
             <label class="section-label">Mục đích sử dụng <span class="required">*</span></label>
             <div class="selection-grid">

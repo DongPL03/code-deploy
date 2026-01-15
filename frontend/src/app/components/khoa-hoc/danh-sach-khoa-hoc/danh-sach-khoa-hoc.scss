@@ -500,21 +500,195 @@
   }
 }
 
-@media (max-width: 900px) {
-  .inventory-layout {
-    grid-template-columns: 1fr;
+/* --- RESPONSIVE MOBILE CHO KHÓA HỌC --- */
+@media (max-width: 992px) {
+
+  /* 1. Container & Padding */
+  .inventory-container {
+    padding: 15px 15px 100px;
   }
-  .control-panel {
-    position: relative;
-    top: 0;
-  }
+
+  /* 2. Header gọn gàng hơn */
   .inventory-header {
     flex-direction: column;
+    align-items: flex-start; /* Căn trái thay vì giữa */
     gap: 15px;
-    text-align: center;
+    padding: 15px;
+    margin-bottom: 20px;
   }
+
+  .header-content h1 {
+    font-size: 1.5rem;
+  }
+
   .btn-hero-3d {
-    width: 100%;
+    width: 100%; /* Nút tạo khóa học full chiều rộng cho dễ bấm */
     justify-content: center;
   }
+
+  /* 3. Xử lý Bộ lọc (Filter) dạng Collapsible */
+  .inventory-layout {
+    grid-template-columns: 1fr; /* 1 cột duy nhất */
+    gap: 20px;
+  }
+
+  .control-panel {
+    padding: 15px;
+    position: relative; /* Bỏ sticky để tránh lỗi scroll trên mobile */
+    top: 0;
+  }
+
+  /* Chỉnh Header của panel để trông giống nút bấm */
+  .panel-header {
+    margin-bottom: 0; /* Mặc định không margin */
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 5px 0; /* Tăng diện tích bấm */
+  }
+
+  .mobile-toggle-icon {
+    display: block !important; /* Hiện mũi tên */
+    transition: transform 0.3s;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .mobile-toggle-icon.rotate {
+    transform: rotate(180deg); /* Xoay mũi tên khi mở */
+  }
+
+  /* Ẩn nội dung filter mặc định */
+  .filter-content {
+    display: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #eee;
+    animation: slideDownFilter 0.3s ease-out;
+  }
+
+  /* Hiện nội dung khi biến isMobileFilterOpen = true */
+  .filter-content.show-mobile {
+    display: block;
+  }
+
+  /* 4. Grid khóa học */
+  .card-grid {
+    /* Đảm bảo mỗi dòng 1 thẻ, nhưng không quá nhỏ */
+    grid-template-columns: 1fr;
+  }
+
+  .skill-card {
+    /* Tối ưu thẻ card */
+    margin-bottom: 0;
+  }
+}
+
+/* Ẩn icon toggle trên Desktop */
+.mobile-toggle-icon {
+  display: none;
+}
+
+@keyframes slideDownFilter {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-trigger {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid #f0f2f5;
+  background: white;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.dropdown-trigger:hover {
+  border-color: #d1d5db;
+}
+
+.dropdown-trigger .arrow {
+  transition: transform 0.3s;
+  color: var(--text-muted);
+}
+
+.dropdown-trigger .arrow.rotate {
+  transform: rotate(180deg);
+}
+
+.dropdown-options-list {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid #f0f2f5;
+}
+
+.dropdown-options-list::-webkit-scrollbar {
+  width: 5px;
+}
+.dropdown-options-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: 0.2s;
+  font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+  background: #f3f4f6;
+  color: var(--primary);
+  padding-left: 20px;
+}
+
+.dropdown-item.active {
+  background: #eef2ff;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+
+.backdrop-click {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  cursor: default;
+  background: transparent;
+}
+
+/* Animation */
+.animate-fade-down {
+  animation: fadeDownSelect 0.2s ease-out;
+}
+
+@keyframes fadeDownSelect {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

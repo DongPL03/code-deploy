@@ -33,25 +33,30 @@
 
           <div class="form-group full-width">
             <label>Bộ câu hỏi <span class="required">*</span></label>
-            <div class="select-wrapper">
-              <i class="fas fa-book-open input-icon"></i>
-              <select
-                [(ngModel)]="form.bo_cau_hoi_id"
-                name="bo_cau_hoi_id"
-                required
-                (ngModelChange)="onBoCauHoiChanged($event)"
-                [disabled]="loading_sets"
-              >
-                <option [ngValue]="0" disabled>— Chọn bộ câu hỏi —</option>
-                @for (bo of boCauHoiOptions; track bo.id) {
-                  <option [ngValue]="bo.id">{{ bo.tieu_de }}</option>
-                }
-              </select>
-              <i class="fas fa-chevron-down arrow-icon"></i>
+            <div class="custom-dropdown-container">
+              <div class="dropdown-trigger"
+                   [class.disabled]="loading_sets"
+                   (click)="toggleBoCauHoiDropdown()">
+                <div class="trigger-content">
+                  <i class="fas fa-book-open input-icon"></i>
+                  <span class="selected-text" [class.placeholder]="!form.bo_cau_hoi_id">{{ getSelectedBoCauHoiName() }}</span>
+                </div>
+                <i class="fas fa-chevron-down arrow-icon" [class.rotate]="showBoCauHoiDropdown"></i>
+              </div>
+
+              @if (showBoCauHoiDropdown) {
+                <div class="dropdown-options-list animate-fade-down">
+                  @for (bo of boCauHoiOptions; track bo.id) {
+                    <div class="dropdown-item"
+                         [class.active]="form.bo_cau_hoi_id === bo.id"
+                         (click)="selectBoCauHoi(bo.id)">
+                      {{ bo.tieu_de }}
+                    </div>
+                  }
+                </div>
+                <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
+              }
             </div>
-            @if (loading_sets) {
-              <small class="hint"><i class="fas fa-spinner fa-spin"></i> Đang tải danh sách...</small>
-            }
           </div>
         </div>
       </section>
@@ -161,13 +166,32 @@
 
           <div class="form-group full-width">
             <label>Luật tính điểm</label>
-            <div class="select-wrapper">
-              <select [(ngModel)]="form.luat_tinh_diem" name="luat_tinh_diem">
-                <option value="" disabled selected hidden>-- Chọn luật --</option>
-                <option value="CO_BAN">Điểm cơ bản</option>
-                <option value="THUONG_TOC_DO">Điểm cơ bản + điểm thưởng thời gian</option>
-              </select>
-              <i class="fas fa-chevron-down arrow-icon"></i>
+
+            <div class="custom-dropdown-container">
+              <div class="dropdown-trigger" (click)="toggleLuatDropdown()">
+                <div class="trigger-content">
+        <span class="selected-text" style="margin-left: 15px;">
+          {{ getSelectedLuatName() }}
+        </span>
+                </div>
+                <i class="fas fa-chevron-down arrow-icon" [class.rotate]="showLuatDropdown"></i>
+              </div>
+
+              @if (showLuatDropdown) {
+                <div class="dropdown-options-list animate-fade-down">
+                  <div class="dropdown-item"
+                       [class.active]="form.luat_tinh_diem === 'CO_BAN'"
+                       (click)="selectLuat('CO_BAN')">
+                    Điểm cơ bản
+                  </div>
+                  <div class="dropdown-item"
+                       [class.active]="form.luat_tinh_diem === 'THUONG_TOC_DO'"
+                       (click)="selectLuat('THUONG_TOC_DO')">
+                    Điểm cơ bản + điểm thưởng thời gian
+                  </div>
+                </div>
+                <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
+              }
             </div>
           </div>
 

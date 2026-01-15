@@ -940,3 +940,247 @@
 
   /* Hiệu ứng xoay icon khi hover */
 }
+/* --- CUSTOM DROPDOWN STYLE --- */
+.custom-dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-trigger {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  height: 48px;
+}
+
+.dropdown-trigger:hover {
+  border-color: var(--primary);
+}
+
+.selected-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #1E293B;
+}
+
+.selected-text.placeholder {
+  color: #64748B;
+}
+
+.arrow {
+  transition: transform 0.3s;
+  color: #64748B;
+  margin-left: 10px;
+}
+
+.arrow.rotate {
+  transform: rotate(180deg);
+}
+
+.dropdown-options-list {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  z-index: 100;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid #E2E8F0;
+}
+
+/* Style riêng cho cái filter lịch sử nhỏ gọn */
+.mini-container {
+  width: 200px;
+}
+
+.mini-trigger {
+  padding: 6px 12px;
+  height: 36px;
+  font-size: 0.85rem;
+  background: white;
+}
+
+/* Danh sách dropdown bên phải căn lề phải để không bị tràn màn hình */
+.dropdown-options-list.right-aligned {
+  left: auto;
+  right: 0;
+  width: 250px; /* Rộng hơn trigger một chút để hiển thị tên dài */
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #475569;
+  transition: 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #F1F5F9;
+  color: var(--primary);
+}
+
+.dropdown-item.active {
+  background: #EEF2FF;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.backdrop-click {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99;
+  cursor: default;
+  background: transparent;
+}
+
+.animate-fade-down {
+  animation: fadeDownSelect 0.2s ease-out;
+}
+
+@keyframes fadeDownSelect {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 992px) {
+  .practice-page {
+    padding: 15px;
+    padding-bottom: 110px !important; /* Né menu dưới */
+  }
+
+  /* 1. HERO SECTION */
+  .training-hero {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .hero-left {
+    flex-direction: column;
+    text-align: center;
+
+    .icon-dojo {
+      margin-bottom: 10px;
+    }
+  }
+
+  .control-panel {
+    min-width: unset; /* Bỏ min-width cũ gây tràn */
+    padding: 20px;
+  }
+
+  .input-group label {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  /* Nút bấm trên mobile stack dọc cho dễ bấm */
+  .action-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-start, .btn-memo {
+    width: 100%;
+    padding: 15px;
+    font-size: 1rem;
+  }
+
+  /* 2. HISTORY & STATS */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .filters {
+    width: 100%;
+  }
+
+  .mini-container {
+    width: 100%; /* Dropdown filter full width trên mobile */
+  }
+
+  .dropdown-options-list.right-aligned {
+    width: 100%; /* Reset lại width */
+  }
+
+  /* Bảng lịch sử cho phép cuộn ngang */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modern-table th, .modern-table td {
+    white-space: nowrap; /* Giữ dòng không bị ngắt xấu */
+    padding: 10px;
+  }
+
+  /* 3. FLASHCARDS */
+  .flashcard-grid {
+    grid-template-columns: 1fr; /* 1 cột */
+  }
+
+  /* 4. GAMEPLAY (ĐANG CHƠI) */
+  .game-header {
+    flex-direction: column-reverse; /* Đưa timer lên đầu */
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .game-timer {
+    width: 100%;
+    text-align: center;
+  }
+
+  .q-text {
+    font-size: 1.1rem; /* Giảm cỡ chữ câu hỏi */
+  }
+
+  .q-choices {
+    grid-template-columns: 1fr; /* Đáp án xếp dọc */
+    gap: 10px;
+  }
+
+  .choice-btn {
+    padding: 12px;
+  }
+
+  /* 5. RESULT */
+  .result-stats {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .result-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-primary, .btn-outline {
+    width: 100%;
+  }
+}
+.placeholder{
+  background-color: whitesmoke !important;
+}

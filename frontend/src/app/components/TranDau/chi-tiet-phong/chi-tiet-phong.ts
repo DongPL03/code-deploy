@@ -140,6 +140,17 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
   user_history_items: LichSuTranDauResponse[] = [];
   user_history_loading = false;
 
+  // Thêm vào class ChiTietPhong
+  pendingResult = signal<{
+    correct: boolean;
+    gainedPoints: number;
+    combo: number;
+    totalPoints: number; // Điểm tổng mới
+  } | null>(null);
+
+  // Thêm vào đầu class
+  showRoundLeaderboard = signal<boolean>(false);
+
   constructor() {
     super();
     // Kiểm tra xem có cờ 'joined' được gửi từ PhongCho sang không
@@ -536,61 +547,119 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
         break;
       }
       case 'ANSWER_REVEAL': {
-        // Lưu đáp án đúng & giải thích
-        this.revealedCorrectAnswer.set(evt.dap_an_dung); // "A" | "B" | "C" | "D"
-        this.revealedExplanation.set(evt.giai_thich || '');
+        const payload = (evt as any).data || evt;
+        const dapAn = payload.dap_an_dung || payload.dapAnDung || '';
+        const giaiThich = payload.giai_thich || payload.giaiThich || '';
+
+        if (dapAn) {
+          // Set signal để UI cập nhật
+          this.revealedCorrectAnswer.set(dapAn);
+          this.revealedExplanation.set(giaiThich);
+        } else {
+          console.error("❌ Không tìm thấy dap_an_dung trong payload:", payload);
+        }
+
+        // Lấy kết quả từ biến tạm và hiển thị
+        const myResult = this.pendingResult();
+
+        if (myResult) {
+          // --- BẮT ĐẦU LOGIC HIỂN THỊ CŨ CỦA BẠN ---
+
+          // Cập nhật Combo Variable để UI hiển thị lửa/x2...
+          this.currentCombo.set(myResult.combo);
+          this.comboBonusPoints = myResult.gainedPoints; // hoặc tính toán lại nếu muốn tách bonus
+
+          if (myResult.correct) {
+            // 🟢 Nếu ĐÚNG
+            if (myResult.combo >= 2) {
+              this.triggerComboVFX(); // Gọi hiệu ứng cháy nổ
+            } else {
+              Swal.fire({
+                icon: 'success',
+                title: `Chính xác! +${myResult.gainedPoints} điểm`,
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 2000,
+                background: '#dcfce7',
+                color: '#166534',
+              });
+            }
+          } else {
+            // 🔴 Nếu SAI
+            Swal.fire({
+              icon: 'error',
+              title: 'Sai rồi!',
+              text: 'Tiếc quá!',
+              toast: true,
+              position: 'top',
+              showConfirmButton: false,
+              timer: 2000,
+              background: '#fee2e2',
+              color: '#991b1b',
+            });
+          }
+
+          // Cập nhật điểm tổng lên UI (Lúc này mới cập nhật để tạo bất ngờ)
+          this.syncState.update((s) => (s ? {...s, my_total_points: myResult.totalPoints} : s));
+
+          // Reset biến tạm để tránh lặp lại
+          this.pendingResult.set(null);
+
+        } else {
+          // Trường hợp người chơi KHÔNG nộp bài (Hết giờ mà chưa submit)
+          Swal.fire({
+            icon: 'warning',
+            title: 'Hết giờ!',
+            text: 'Bạn chưa kịp trả lời câu này.',
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
         break;
       }
       case 'SCORE_UPDATE':
         const myId = this.userService.getUserId();
         if (evt.user_id !== myId) return;
-        const combo = evt.combo_streak ?? 0;
-        this.currentCombo.set(combo);
-        const pointsBonus = evt.combo_bonus || 0;
-        const pointsGained = evt.gained_points || 0;
-        this.comboBonusPoints = pointsGained;
-        if (evt.correct) {
-          if (combo >= 2) {
-            this.triggerComboVFX();
-          } else {
-            Swal.fire({
-              icon: 'success',
-              title: `+${pointsGained} điểm`,
-              toast: true,
-              position: 'top',
-              showConfirmButton: false,
-              timer: 1200,
-              background: '#dcfce7',
-              color: '#166534',
-            }).then((r) => {
-            });
-          }
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Sai rồi!',
-            text: 'Tiếc quá!',
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 1500,
-            background: '#fee2e2', // Nền đỏ nhạt
-            color: '#991b1b',
-          }).then((r) => {
-          });
-        }
-        setTimeout(() => {
-          this.syncState.update((s) => (s ? {...s, my_total_points: evt.total_points} : s));
-        }, 300);
+
+        // 1. Lưu thông tin vào biến tạm để dành
+        this.pendingResult.set({
+          correct: evt.correct,
+          gainedPoints: evt.gained_points || 0,
+          combo: evt.combo_streak || 0,
+          totalPoints: evt.total_points
+        });
+
+        // 2. Chỉ hiện thông báo chờ (Suspense)
+        Swal.fire({
+          icon: 'info',
+          title: 'Đã nộp đáp án!',
+          text: 'Đang chờ kết quả...',
+          toast: true,
+          position: 'top',
+          showConfirmButton: false,
+          timer: 3000, // Hiện lâu một chút cho đến khi hết giờ
+          background: '#f0f9ff',
+          color: '#0284c7',
+        });
+
+        // Đánh dấu đã nộp để disable nút
+        this.submittedCurrentAnswer.set(true);
         break;
 
-      case 'LEADERBOARD_UPDATE':
+      case 'LEADERBOARD_UPDATE': {
         // @ts-ignore
         this.leaderboard.set(evt.players || []);
         if (evt.players && evt.players.length > 0) {
           this.onlineCount.set(evt.players.length);
         }
+        setTimeout(() => {
+          this.showRoundLeaderboard.set(true);
+        }, 2000); // Sau 2 giây mới hiện BXH
         break;
+      }
 
       case 'FINISHED': {
         this.battle.set({...(this.battle() as TranDauResponse), trang_thai: 'HOAN_THANH'});

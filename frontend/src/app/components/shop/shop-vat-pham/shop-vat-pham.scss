@@ -462,3 +462,170 @@
     transform: translateY(0);
   }
 }
+
+/* --- STYLE CHO CUSTOM DROPDOWN --- */
+.custom-dropdown-container {
+  position: relative;
+  min-width: 180px; /* Đảm bảo độ rộng tối thiểu */
+}
+
+.dropdown-trigger {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 12px;
+  border: 1px solid #E4E4E4;
+  background: #F8F9FD;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.dropdown-trigger:hover {
+  border-color: var(--primary);
+  background: white;
+}
+
+.arrow {
+  transition: transform 0.3s;
+  color: var(--text-sub);
+  margin-left: 10px;
+  font-size: 0.8rem;
+}
+
+.arrow.rotate {
+  transform: rotate(180deg);
+}
+
+.dropdown-options-list {
+  position: absolute;
+  top: 115%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid #E4E4E4;
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-sub);
+  transition: 0.2s;
+  font-size: 0.9rem;
+}
+
+.dropdown-item:hover {
+  background: #F3F0FF;
+  color: var(--primary);
+}
+
+.dropdown-item.active {
+  background: #EBF8FF;
+  color: #3182CE;
+}
+
+.backdrop-click {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99;
+  cursor: default;
+  background: transparent;
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 992px) {
+  .shop-page {
+    padding: 15px;
+    padding-bottom: 110px !important; /* Né menu dưới đáy */
+  }
+
+  /* 1. Header */
+  .shop-header .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .shop-header .balance-card {
+    width: 100%;
+    align-items: center; /* Căn giữa số tiền trên mobile */
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  /* 2. Filter Bar (Dồn hàng dọc) */
+  .filter-bar {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .filter-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Label trên, Select dưới */
+    align-items: stretch; /* Kéo full chiều rộng */
+    gap: 5px;
+    padding: 0 !important; /* Reset padding cũ */
+    border: none !important; /* Reset border cũ */
+    background: transparent !important; /* Reset background cũ */
+    box-shadow: none !important;
+  }
+
+  .filter-group label {
+    margin-left: 5px;
+  }
+
+  .custom-dropdown-container {
+    width: 100%; /* Dropdown full width */
+  }
+
+  .dropdown-trigger {
+    background: white; /* Nền trắng cho nổi bật */
+    height: 48px;
+  }
+
+  /* 3. Shop Grid */
+  .shop-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Card nhỏ hơn trên mobile để hiển thị 2 cột */
+    gap: 15px;
+  }
+
+  .item-card {
+    padding: 15px;
+  }
+
+  .item-card .item-icon-wrapper .icon-circle {
+    width: 50px;
+    height: 50px;
+    font-size: 1.8rem;
+  }
+
+  .item-card .item-info .item-desc {
+    font-size: 0.75rem;
+    min-height: 30px;
+  }
+
+  .item-card .item-footer .price-tag {
+    font-size: 1rem;
+  }
+
+  .item-card .item-footer .btn-buy {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+}

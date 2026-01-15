@@ -103,4 +103,6 @@ public interface ITranDauService {
      */
     List<NguoiChoiTrongPhongResponse> getPlayersInRoom(Long tranDauId) throws Exception;
 
+    void processQuestionTimeout(Long tranDauId);
+
 }

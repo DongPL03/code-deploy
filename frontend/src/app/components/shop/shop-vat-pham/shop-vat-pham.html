@@ -19,24 +19,58 @@
   </header>
 
   <div class="filter-bar animate-fade-up">
+
     <div class="filter-group">
       <label>Độ hiếm:</label>
-      <select [ngModel]="filterRarity()" (ngModelChange)="filterRarity.set($event)">
-        <option value="ALL">Tất cả</option>
-        <option value="COMMON">Thường</option>
-        <option value="RARE">Hiếm</option>
-        <option value="EPIC">Sử thi</option>
-        <option value="LEGENDARY">Huyền thoại</option>
-      </select>
+      <div class="custom-dropdown-container">
+        <div class="dropdown-trigger" (click)="toggleRarityDropdown()">
+          <span class="selected-text">{{ getSelectedRarityLabel() }}</span>
+          <i class="fas fa-chevron-down arrow" [class.rotate]="showRarityDropdown"></i>
+        </div>
+
+        @if (showRarityDropdown) {
+          <div class="dropdown-options-list animate-fade-down">
+            <div class="dropdown-item" [class.active]="filterRarity() === 'ALL'" (click)="selectRarity('ALL')">Tất cả
+            </div>
+            <div class="dropdown-item" [class.active]="filterRarity() === 'COMMON'" (click)="selectRarity('COMMON')">
+              Thường
+            </div>
+            <div class="dropdown-item" [class.active]="filterRarity() === 'RARE'" (click)="selectRarity('RARE')">Hiếm
+            </div>
+            <div class="dropdown-item" [class.active]="filterRarity() === 'EPIC'" (click)="selectRarity('EPIC')">Sử
+              thi
+            </div>
+            <div class="dropdown-item" [class.active]="filterRarity() === 'LEGENDARY'"
+                 (click)="selectRarity('LEGENDARY')">Huyền thoại
+            </div>
+          </div>
+          <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
+        }
+      </div>
     </div>
 
     <div class="filter-group">
       <label>Sắp xếp:</label>
-      <select [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
-        <option value="PRICE_ASC">Giá: Thấp -> Cao</option>
-        <option value="PRICE_DESC">Giá: Cao -> Thấp</option>
-        <option value="RARITY">Độ hiếm</option>
-      </select>
+      <div class="custom-dropdown-container">
+        <div class="dropdown-trigger" (click)="toggleSortDropdown()">
+          <span class="selected-text">{{ getSelectedSortLabel() }}</span>
+          <i class="fas fa-chevron-down arrow" [class.rotate]="showSortDropdown"></i>
+        </div>
+
+        @if (showSortDropdown) {
+          <div class="dropdown-options-list animate-fade-down">
+            <div class="dropdown-item" [class.active]="sortBy() === 'PRICE_ASC'" (click)="selectSort('PRICE_ASC')">Giá:
+              Thấp -> Cao
+            </div>
+            <div class="dropdown-item" [class.active]="sortBy() === 'PRICE_DESC'" (click)="selectSort('PRICE_DESC')">
+              Giá: Cao -> Thấp
+            </div>
+            <div class="dropdown-item" [class.active]="sortBy() === 'RARITY'" (click)="selectSort('RARITY')">Độ hiếm
+            </div>
+          </div>
+          <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
+        }
+      </div>
     </div>
   </div>
 
@@ -58,7 +92,8 @@
 
           <div class="item-icon-wrapper">
             <div class="icon-circle" [style.color]="item.mau_sac">
-              {{ item.icon }} </div>
+              {{ item.icon }}
+            </div>
           </div>
 
           <div class="item-info">
@@ -79,9 +114,13 @@
 
             <button class="btn-buy" (click)="purchaseItem(item)"
                     [disabled]="!item.co_the_mua || purchasing() || tienVang() < item.gia_xu">
-              @if (purchasing()) { <span class="spinner-sm"></span> }
-              @else if (tienVang() < item.gia_xu) { Thiếu xu }
-              @else { Mua ngay }
+              @if (purchasing()) {
+                <span class="spinner-sm"></span>
+              } @else if (tienVang() < item.gia_xu) {
+                Thiếu xu
+              } @else {
+                Mua ngay
+              }
             </button>
           </div>
 
@@ -105,5 +144,4 @@
       <span class="tag reset">⏰ Reset: Thứ 2</span>
     </div>
   </div>
-
 </div>

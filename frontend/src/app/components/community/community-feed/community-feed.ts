@@ -48,6 +48,9 @@ export class CommunityFeedComponent implements OnInit, OnDestroy {
 
   loaiBaiVietOptions = LOAI_BAI_VIET_OPTIONS;
 
+  showMobileFilters = false;
+  showMobileChat = false;
+
   constructor(
     private communityService: CommunityService,
     private route: ActivatedRoute,
@@ -208,5 +211,15 @@ export class CommunityFeedComponent implements OnInit, OnDestroy {
       pages.push(i);
     }
     return pages;
+  }
+
+  toggleMobileFilters() {
+    this.showMobileFilters = !this.showMobileFilters;
+    if (this.showMobileFilters) this.showMobileChat = false; // Đóng cái kia nếu mở cái này
+  }
+
+  toggleMobileChat() {
+    this.showMobileChat = !this.showMobileChat;
+    if (this.showMobileChat) this.showMobileFilters = false;
   }
 }

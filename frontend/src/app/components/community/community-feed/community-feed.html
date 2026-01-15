@@ -1,5 +1,4 @@
 <div class="community-feed">
-  <!-- Header -->
   <div class="feed-header animate-fade-down">
     <div class="header-content">
       <h1>Cộng đồng</h1>
@@ -7,12 +6,14 @@
     </div>
     <a routerLink="/community/create" class="btn-create-post">
       <i class="fas fa-plus"></i>
-      Tạo bài viết
-    </a>
+      <span class="btn-text">Tạo bài viết</span> </a>
   </div>
 
-  <!-- Search & Tabs -->
   <div class="feed-controls animate-fade-up">
+    <button class="btn-mobile-filter" (click)="toggleMobileFilters()">
+      <i class="fas fa-filter"></i>
+      <span>Lọc & Chủ đề</span>
+    </button>
     <div class="search-box">
       <i class="fas fa-search"></i>
       <input type="text" placeholder="Tìm kiếm bài viết..."
@@ -24,77 +25,79 @@
         </button>
       }
     </div>
-
     <div class="tabs">
       <button class="tab"
               [class.active]="activeTab === 'feed' && !selectedTagId && !searchKeyword"
               (click)="onTabChange('feed')">
         <i class="fas fa-home"></i>
-        Mới nhất
+        <span class="tab-text">Mới nhất</span>
       </button>
       <button class="tab"
               [class.active]="activeTab === 'hot' && !selectedTagId && !searchKeyword"
               (click)="onTabChange('hot')">
         <i class="fas fa-fire"></i>
-        Nổi bật
+        <span class="tab-text">Nổi bật</span>
       </button>
       <button class="tab" [class.active]="activeTab === 'saved'"
               (click)="onTabChange('saved')">
         <i class="fas fa-bookmark"></i>
-        Đã lưu
+        <span class="tab-text">Đã lưu</span>
       </button>
       <button class="tab" [class.active]="activeTab === 'my-posts'"
               (click)="onTabChange('my-posts')">
         <i class="fas fa-user"></i>
-        Bài của tôi
+        <span class="tab-text">Bài của tôi</span>
       </button>
     </div>
   </div>
-
   <div class="feed-layout">
-
-    <aside class="feed-sidebar animate-fade-right">
-
-      <div class="sidebar-section">
-        <h3><i class="fas fa-tags"></i> Chủ đề phổ biến</h3>
-        <div class="popular-tags">
-          @for (tag of popularTags; track tag.id) {
-            <button class="tag-chip" [class.active]="selectedTagId === tag.id"
-                    [style.--tag-color]="tag.mauSac" (click)="onTagSelect(tag.id)">
-              <span class="tag-name">{{ tag.ten }}</span>
-              <span class="tag-count">{{ tag.soBaiViet }}</span>
-            </button>
-          }
-        </div>
-        <a routerLink="/community/tags" class="view-all-tags">
-          Xem tất cả chủ đề <i class="fas fa-arrow-right"></i>
-        </a>
+    <div class="mobile-backdrop" [class.show]="showMobileFilters" (click)="toggleMobileFilters()"></div>
+    <aside class="feed-sidebar animate-fade-right" [class.mobile-active]="showMobileFilters">
+      <div class="mobile-sidebar-header">
+        <h3>Bộ lọc & Chủ đề</h3>
+        <button class="btn-close-sidebar" (click)="toggleMobileFilters()">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
-
-      <div class="sidebar-section">
-        <h3><i class="fas fa-filter"></i> Loại bài viết</h3>
-        <div class="post-types">
-          @for (type of loaiBaiVietOptions; track type.value) {
-            <div class="post-type-item">
-              <span class="type-icon">{{ type.icon }}</span>
-              <span class="type-label">{{ type.label }}</span>
-            </div>
-          }
+      <div class="sidebar-scroll-content">
+        <div class="sidebar-section">
+          <h3><i class="fas fa-tags"></i> Chủ đề phổ biến</h3>
+          <div class="popular-tags">
+            @for (tag of popularTags; track tag.id) {
+              <button class="tag-chip" [class.active]="selectedTagId === tag.id"
+                      [style.--tag-color]="tag.mauSac"
+                      (click)="onTagSelect(tag.id); toggleMobileFilters()"> <span class="tag-name">{{ tag.ten }}</span>
+                <span class="tag-count">{{ tag.soBaiViet }}</span>
+              </button>
+            }
+          </div>
+          <a routerLink="/community/tags" class="view-all-tags">
+            Xem tất cả chủ đề <i class="fas fa-arrow-right"></i>
+          </a>
         </div>
-      </div>
 
-      <div class="sidebar-section tips">
-        <h3><i class="fas fa-lightbulb"></i> Mẹo hay</h3>
-        <ul>
-          <li>Sử dụng thẻ phù hợp để bài viết dễ tìm thấy</li>
-          <li>Đặt câu hỏi rõ ràng để nhận được câu trả lời tốt</li>
-          <li>Tham gia thảo luận để tăng điểm uy tín</li>
-        </ul>
+        <div class="sidebar-section">
+          <h3><i class="fas fa-filter"></i> Loại bài viết</h3>
+          <div class="post-types">
+            @for (type of loaiBaiVietOptions; track type.value) {
+              <div class="post-type-item">
+                <span class="type-icon">{{ type.icon }}</span>
+                <span class="type-label">{{ type.label }}</span>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="sidebar-section tips">
+          <h3><i class="fas fa-lightbulb"></i> Mẹo hay</h3>
+          <ul>
+            <li>Sử dụng thẻ phù hợp để bài viết dễ tìm thấy</li>
+            <li>Đặt câu hỏi rõ ràng để nhận được câu trả lời tốt</li>
+            <li>Tham gia thảo luận để tăng điểm uy tín</li>
+          </ul>
+        </div>
       </div>
     </aside>
-    <!-- Main Content -->
     <div class="feed-main animate-fade-up">
-      <!-- Selected Tag Badge -->
       @if (selectedTagId) {
         @let selectedTag = getTagById(selectedTagId);
         @if (selectedTag) {
@@ -105,15 +108,10 @@
           </div>
         }
       }
-
-      <!-- Search Results Info -->
       @if (searchKeyword) {
         <div class="search-results-info">
-        <span>Kết quả tìm kiếm cho "{{
-            searchKeyword
-          }}"</span>
-          <span class="result-count">({{ totalItems }} kết
-          quả)</span>
+          <span>Kết quả tìm kiếm cho "{{ searchKeyword }}"</span>
+          <span class="result-count">({{ totalItems }} kết quả)</span>
         </div>
       }
       @if (loading) {
@@ -121,35 +119,45 @@
           <div class="spinner"></div>
           <p>Đang tải...</p></div>
       } @else if (error) {
-        <div class="error-container"><p>{{ error }}</p>
+        <div class="error-container">
+          <p>{{ error }}</p>
           <button (click)="loadPosts()">Thử lại</button>
         </div>
       } @else {
-
         <div class="posts-list">
           @for (post of posts; track post.id) {
             <app-post-card [post]="post" (deleted)="onPostDeleted($event)"
                            (updated)="onPostUpdated($event)"></app-post-card>
           }
         </div>
-
         @if (totalPages > 1) {
           <div class="pagination">
-            <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)"><i
-              class="fas fa-chevron-left"></i></button>
+            <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)">
+              <i class="fas fa-chevron-left"></i>
+            </button>
             <span class="page-info">Trang {{ currentPage + 1 }} / {{ totalPages }}</span>
-            <button class="page-btn" [disabled]="currentPage === totalPages - 1"
-                    (click)="onPageChange(currentPage + 1)"><i class="fas fa-chevron-right"></i></button>
+            <button class="page-btn" [disabled]="currentPage === totalPages - 1" (click)="onPageChange(currentPage + 1)">
+              <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
         }
       }
     </div>
-
-
-    <!-- Right Sidebar: Messages & Friends -->
-    <aside class="right-sidebar animate-fade-left">
-      <app-recent-chats></app-recent-chats>
-      <app-friends-sidebar></app-friends-sidebar>
+    <div class="mobile-backdrop" [class.show]="showMobileChat" (click)="toggleMobileChat()"></div>
+    <aside class="right-sidebar animate-fade-left" [class.mobile-active]="showMobileChat">
+      <div class="mobile-sidebar-header right">
+        <h3>Tin nhắn & Bạn bè</h3>
+        <button class="btn-close-sidebar" (click)="toggleMobileChat()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="sidebar-scroll-content">
+        <app-recent-chats></app-recent-chats>
+        <app-friends-sidebar></app-friends-sidebar>
+      </div>
     </aside>
   </div>
+  <button class="fab-chat" (click)="toggleMobileChat()">
+    <i class="fas fa-comment-dots"></i>
+  </button>
 </div>

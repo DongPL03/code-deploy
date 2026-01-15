@@ -8,6 +8,7 @@ import {LichSuTranDauResponse} from '../../../../responses/trandau/lichsutrandau
 import {TranDauResponse} from '../../../../responses/trandau/trandau-response';
 import {Base} from '../../../base/base';
 import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
+import {environment} from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-trandau-list',
@@ -52,6 +53,8 @@ export class AdminTranDauList extends Base implements OnInit {
   toDateFilter = '';
 
   showFilter = false;
+
+  readonly imageBaseURL = `${environment.apiBaseUrl}/users/profile-images/`;
 
   ngOnInit(): void {
     this.refreshData();
@@ -275,5 +278,14 @@ export class AdminTranDauList extends Base implements OnInit {
     this.loadStats();
     this.loadPending();
     this.loadHistory();
+  }
+
+  getAvatar(avatarUrl: any, name: any) {
+    if (avatarUrl) {
+      if (avatarUrl.startsWith('http')) return avatarUrl;
+      return this.imageBaseURL + avatarUrl;
+    }
+    const safeName = encodeURIComponent(name || 'User');
+    return `https://ui-avatars.com/api/?name=${safeName}&background=random&color=fff&size=128`;
   }
 }

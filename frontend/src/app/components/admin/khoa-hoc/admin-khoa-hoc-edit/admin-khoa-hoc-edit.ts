@@ -21,7 +21,7 @@ export class AdminKhoaHocEdit extends Base implements OnInit {
     mo_ta: '',
     hinh_anh: '',
     chu_de_id: 0,
-    trang_thai: 'DRAFT',
+    trang_thai: 'BAN_NHAP',
     gia_mo_khoa: 0,
     thu_tu: 0,
   };

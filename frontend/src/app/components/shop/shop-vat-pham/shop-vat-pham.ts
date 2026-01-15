@@ -1,9 +1,9 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {Component, OnInit, computed, inject, signal} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import Swal from 'sweetalert2';
-import { MuaVatPhamResponse, ShopItem, ShopResponse } from '../../../models/vat-pham.model';
-import { VatPhamService } from '../../../services/vat-pham.service';
+import {MuaVatPhamResponse, ShopItem, ShopResponse} from '../../../models/vat-pham.model';
+import {VatPhamService} from '../../../services/vat-pham.service';
 
 @Component({
   selector: 'app-shop-vat-pham',
@@ -21,9 +21,13 @@ export class ShopVatPham implements OnInit {
   loading = signal<boolean>(false);
   purchasing = signal<boolean>(false);
 
-  // Filter & Sort
+  // Filter & Sort Signals
   filterRarity = signal<string>('ALL');
   sortBy = signal<string>('PRICE_ASC');
+
+  // 1. Biến điều khiển Dropdown
+  showRarityDropdown = false;
+  showSortDropdown = false;
 
   // Computed: Filtered & Sorted items
   filteredItems = computed(() => {
@@ -45,7 +49,7 @@ export class ShopVatPham implements OnInit {
         items.sort((a, b) => b.gia_xu - a.gia_xu);
         break;
       case 'RARITY':
-        const rarityOrder = { COMMON: 1, RARE: 2, EPIC: 3, LEGENDARY: 4 };
+        const rarityOrder: any = {COMMON: 1, RARE: 2, EPIC: 3, LEGENDARY: 4};
         items.sort((a, b) => (rarityOrder[b.do_hiem] || 0) - (rarityOrder[a.do_hiem] || 0));
         break;
     }
@@ -73,6 +77,51 @@ export class ShopVatPham implements OnInit {
     });
   }
 
+  // --- XỬ LÝ DROPDOWN ĐỘ HIẾM ---
+  toggleRarityDropdown() {
+    this.showRarityDropdown = !this.showRarityDropdown;
+    this.showSortDropdown = false;
+  }
+
+  selectRarity(value: string) {
+    this.filterRarity.set(value);
+    this.showRarityDropdown = false;
+  }
+
+  getSelectedRarityLabel(): string {
+    return this.getRarityLabel(this.filterRarity());
+  }
+
+  // --- XỬ LÝ DROPDOWN SẮP XẾP ---
+  toggleSortDropdown() {
+    this.showSortDropdown = !this.showSortDropdown;
+    this.showRarityDropdown = false;
+  }
+
+  selectSort(value: string) {
+    this.sortBy.set(value);
+    this.showSortDropdown = false;
+  }
+
+  getSelectedSortLabel(): string {
+    switch (this.sortBy()) {
+      case 'PRICE_ASC':
+        return 'Giá: Thấp -> Cao';
+      case 'PRICE_DESC':
+        return 'Giá: Cao -> Thấp';
+      case 'RARITY':
+        return 'Độ hiếm';
+      default:
+        return 'Sắp xếp';
+    }
+  }
+
+  closeAllDropdowns() {
+    this.showRarityDropdown = false;
+    this.showSortDropdown = false;
+  }
+
+  // --- MUA HÀNG ---
   purchaseItem(item: ShopItem): void {
     if (!item.co_the_mua) {
       if (item.thong_bao_gioi_han) {
@@ -87,13 +136,12 @@ export class ShopVatPham implements OnInit {
       title: `Mua ${item.ten}?`,
       html: `
         <div class="purchase-confirm">
-          <div class="item-icon" style="font-size: 3rem;">${item.icon}</div>
-          <p class="item-name">${item.ten}</p>
-          <p class="item-desc">${item.mo_ta}</p>
-          <div class="price-info">
-            <span class="price">💰 ${item.gia_xu} xu</span>
+          <div class="item-icon" style="font-size: 3rem; text-align: center; margin-bottom: 10px;">${item.icon}</div>
+          <p class="item-name" style="font-weight: bold; font-size: 1.2rem;">${item.ten}</p>
+          <div class="price-info" style="margin: 10px 0; color: #d69e2e; font-weight: bold; font-size: 1.1rem;">
+            💰 ${item.gia_xu} xu
           </div>
-          <p class="balance">Số dư: <strong>${this.tienVang()} xu</strong></p>
+          <p class="balance" style="font-size: 0.9rem; color: #666;">Số dư hiện tại: <strong>${this.tienVang()} xu</strong></p>
         </div>
       `,
       showCancelButton: true,
@@ -115,12 +163,9 @@ export class ShopVatPham implements OnInit {
         this.purchasing.set(false);
 
         if (response.thanh_cong) {
-          // Update local gold
           if (response.tien_vang_con_lai !== undefined) {
             this.tienVang.set(response.tien_vang_con_lai);
           }
-
-          // Update item purchasability
           this.updateItemAfterPurchase(item);
 
           Swal.fire({
@@ -146,7 +191,6 @@ export class ShopVatPham implements OnInit {
   }
 
   private updateItemAfterPurchase(item: ShopItem): void {
-    // Reload shop to get updated limits
     this.loadShop();
   }
 
@@ -156,6 +200,8 @@ export class ShopVatPham implements OnInit {
 
   getRarityLabel(rarity: string): string {
     switch (rarity) {
+      case 'ALL':
+        return 'Tất cả';
       case 'COMMON':
         return 'Thường';
       case 'RARE':

@@ -24,14 +24,42 @@ export class AdminCauHoiCreate extends Base implements OnInit {
   submitting = false;
   hovering = false;
 
+  showDifficultyDropdown = false;
+
   readonly luaChonList: ('A' | 'B' | 'C' | 'D')[] = ['A', 'B', 'C', 'D'];
 
   ngOnInit(): void {
     this.boCauHoiId = Number(this.route.snapshot.paramMap.get('id'));
     this.model.bo_cau_hoi_id = this.boCauHoiId;
-    this.model.loai_noi_dung = 'VAN_BAN'; // Default
-    this.model.dap_an_dung = 'A'; // Default selection
-    this.model.do_kho = 'DE'; // Default difficulty
+    this.model.loai_noi_dung = 'VAN_BAN';
+    this.model.dap_an_dung = 'A';
+    this.model.do_kho = 'DE';
+  }
+
+  toggleDifficultyDropdown() {
+    this.showDifficultyDropdown = !this.showDifficultyDropdown;
+  }
+
+  selectDifficulty(val: 'DE' | 'TRUNG_BINH' | 'KHO') {
+    this.model.do_kho = val;
+    this.showDifficultyDropdown = false;
+  }
+
+  closeDropdown() {
+    this.showDifficultyDropdown = false;
+  }
+
+  getDifficultyLabel(): string {
+    switch (this.model.do_kho) {
+      case 'DE':
+        return '🟢 Dễ';
+      case 'TRUNG_BINH':
+        return '🟡 Trung bình';
+      case 'KHO':
+        return '🔴 Khó';
+      default:
+        return 'Chọn độ khó';
+    }
   }
 
   setMediaType(type: 'VAN_BAN' | 'HINH_ANH' | 'AM_THANH' | 'VIDEO'): void {
@@ -62,14 +90,13 @@ export class AdminCauHoiCreate extends Base implements OnInit {
   onSubmit(form: NgForm): void {
     if (this.submitting) return;
     if (form.invalid) {
-      Swal.fire('Thiếu thông tin', 'Vui lòng điền nội dung và các đáp án', 'warning').then(r => {
-      });
+      Swal.fire('Thiếu thông tin', 'Vui lòng điền nội dung và các đáp án', 'warning');
       return;
     }
 
     this.submitting = true;
     this.cauHoiService.create(this.model).subscribe({
-      next: (res: ResponseObject) => {
+      next: (res: ResponseObject<any>) => {
         const created = res.data;
         if (!created?.id) {
           this.submitting = false;
@@ -77,7 +104,6 @@ export class AdminCauHoiCreate extends Base implements OnInit {
           return;
         }
 
-        // Nếu có file media & không phải văn bản → upload
         if (this.selectedFile && this.model.loai_noi_dung !== 'VAN_BAN') {
           const loai = this.model.loai_noi_dung as 'HINH_ANH' | 'AM_THANH' | 'VIDEO';
           this.cauHoiService.uploadMedia(created.id, this.selectedFile, loai).subscribe({
@@ -92,9 +118,12 @@ export class AdminCauHoiCreate extends Base implements OnInit {
                 form.resetForm();
                 this.previewUrl = undefined;
                 this.selectedFile = undefined;
+                // Reset defaults
+                this.model.loai_noi_dung = 'VAN_BAN';
+                this.model.dap_an_dung = 'A';
+                this.model.do_kho = 'DE';
+                this.model.bo_cau_hoi_id = this.boCauHoiId;
               });
-              // 🔁 QUAY VỀ TRANG CHI TIẾT BỘ ADMIN
-              this.router.navigate(['/admin/bo-cau-hoi', this.boCauHoiId]);
             },
             error: (err) => {
               this.submitting = false;
@@ -108,7 +137,6 @@ export class AdminCauHoiCreate extends Base implements OnInit {
             }
           });
         } else {
-          // Không có file media
           this.handleSuccess(form);
         }
       },
@@ -162,11 +190,11 @@ export class AdminCauHoiCreate extends Base implements OnInit {
     }).then((res) => {
       if (res.isConfirmed) {
         form.resetForm();
-        this.model.loai_noi_dung = 'VAN_BAN'; // Reset về default
+        this.model.loai_noi_dung = 'VAN_BAN';
         this.model.dap_an_dung = 'A';
         this.model.do_kho = 'DE';
-        this.model.bo_cau_hoi_id = this.boCauHoiId; // Set lại ID
-        this.removeSelectedFile(false).then(r => {
+        this.model.bo_cau_hoi_id = this.boCauHoiId;
+        this.removeSelectedFile(false).then(() => {
         });
       } else {
         this.cancel();

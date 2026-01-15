@@ -1,13 +1,14 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import Swal from 'sweetalert2';
 import {
   CreateDanhGiaRequest,
   DanhGiaResponse,
   DanhGiaStatsResponse,
 } from '../../../dtos/danhgia/danhgia.dto';
-import { DanhGiaService } from '../../../services/danhgia.service';
+import {DanhGiaService} from '../../../services/danhgia.service';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-danh-gia',
@@ -44,6 +45,10 @@ export class DanhGiaComponent implements OnInit {
   currentPage: number = 0;
   totalPages: number = 0;
   isLoadingReviews: boolean = false;
+
+  readonly imageBaseURL = `${environment.apiBaseUrl}/users/profile-images/`;
+
+
 
   ngOnInit(): void {
     this.loadStats();
@@ -209,5 +214,15 @@ export class DanhGiaComponent implements OnInit {
     if (this.currentPage < this.totalPages - 1) {
       this.loadReviews(this.currentPage + 1);
     }
+  }
+
+  getAvatar(nguoi_dung_avatar: string | null, nguoi_dung_ten: string) {
+    if (nguoi_dung_avatar) {
+      if (nguoi_dung_avatar.startsWith('http')) return nguoi_dung_avatar;
+      // Link nội bộ
+      return this.imageBaseURL + nguoi_dung_avatar;
+    }
+    const safeName = encodeURIComponent(nguoi_dung_ten || 'User');
+    return `https://ui-avatars.com/api/?name=${safeName}&background=random&color=fff&size=128`;
   }
 }

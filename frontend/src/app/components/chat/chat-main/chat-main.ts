@@ -1,10 +1,9 @@
-
-import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { Subscription } from 'rxjs';
-import { SendMessageDto } from '../../../dtos/tinnhan/send-message-dto';
+import {CommonModule} from '@angular/common';
+import {Component, ElementRef, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {PickerComponent} from '@ctrl/ngx-emoji-mart';
+import {Subscription} from 'rxjs';
+import {SendMessageDto} from '../../../dtos/tinnhan/send-message-dto';
 import {
   GuiTinNhanDTO,
   LoaiPhongChat,
@@ -12,11 +11,11 @@ import {
   PhongChat,
   TinNhan,
 } from '../../../models/chat';
-import { ChatFriendItemResponse } from '../../../responses/chat/chat-friend-item-response';
-import { ChatMessageResponse } from '../../../responses/chat/chat-message-response';
-import { PageResponse } from '../../../responses/page-response';
-import { ResponseObject } from '../../../responses/response-object';
-import { Base } from '../../base/base';
+import {ChatFriendItemResponse} from '../../../responses/chat/chat-friend-item-response';
+import {ChatMessageResponse} from '../../../responses/chat/chat-message-response';
+import {PageResponse} from '../../../responses/page-response';
+import {ResponseObject} from '../../../responses/response-object';
+import {Base} from '../../base/base';
 import {environment} from '../../../environments/environment';
 
 // Kiểu chat hiện tại
@@ -249,40 +248,36 @@ export class ChatMainComponent extends Base implements OnInit, OnDestroy {
   // --- 4. WebSocket Handle ---
   private handleWsMessage(msg: ChatMessageResponse): void {
     if (!msg || !this.current_user_id) return;
-
+    if (msg.tin_nhan_id && this.messages.some(m => m.tin_nhan_id === msg.tin_nhan_id)) {
+      return;
+    }
     const meId = this.current_user_id;
     const partnerId = msg.gui_boi_id === meId ? msg.nhan_boi_id : msg.gui_boi_id;
-
-    // Update Inbox List
     const idx = this.inbox_items.findIndex((it) => it.partner_id === partnerId);
     if (idx >= 0) {
       const item = this.inbox_items[idx];
       const isCurrentOpened = this.active_partner && this.active_partner.partner_id === partnerId;
-
       const updated: ChatFriendItemResponse = {
         ...item,
         last_message: msg.noi_dung,
         last_time: msg.gui_luc,
         unread_count: isCurrentOpened ? 0 : (item.unread_count ?? 0) + 1,
       };
-
       this.inbox_items.splice(idx, 1);
-      this.inbox_items.unshift(updated); // Move to top
-
+      this.inbox_items.unshift(updated);
       if (isCurrentOpened) this.active_partner = updated;
     }
-
-    // Append Message if Chat Open
     if (this.active_partner && this.active_partner.partner_id === partnerId) {
-      this.messages.push(msg);
+      this.push_unique_message(msg);
       setTimeout(() => this.scroll_to_bottom(), 100);
     }
   }
 
+
   private scroll_to_bottom(): void {
     if (this.messages_container) {
       const el = this.messages_container.nativeElement;
-      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+      el.scrollTo({top: el.scrollHeight, behavior: 'smooth'});
     }
   }
 
@@ -800,10 +795,6 @@ export class ChatMainComponent extends Base implements OnInit, OnDestroy {
 
               this.groupChatService.sendMessage(dto).subscribe({
                 next: (msgRes) => {
-                  if (msgRes.data) {
-                    this.groupMessages.push(msgRes.data);
-                    setTimeout(() => this.scroll_to_bottom(), 100);
-                  }
                   this.finishUpload();
                 },
                 error: () => {
@@ -824,7 +815,7 @@ export class ChatMainComponent extends Base implements OnInit, OnDestroy {
               this.chatService.sendMessage(dto).subscribe({
                 next: (msgRes) => {
                   if (msgRes.data) {
-                    this.messages.push(msgRes.data);
+                    this.push_unique_message(msgRes.data);
                     setTimeout(() => this.scroll_to_bottom(), 100);
                   }
                   this.finishUpload();
@@ -882,4 +873,32 @@ export class ChatMainComponent extends Base implements OnInit, OnDestroy {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
+
+  getChatMediaUrl(filename: string) {
+    if (!filename) return '';
+    if (filename.startsWith('http')) return filename;
+    return this.imageBaseURL + filename;
+  }
+
+  deselectChat() {
+    this.active_partner = null;
+    this.activeGroup = null;
+    this.activeChatType = null;
+    // Reset tin nhắn để lần sau mở lại load mới cho sạch
+    this.messages = [];
+    this.groupMessages = [];
+  }
+
+  private push_unique_message(msg: ChatMessageResponse): void {
+    if (!msg) return;
+
+    // ✅ nếu có tin_nhan_id thì chặn trùng theo id
+    if (msg.tin_nhan_id != null) {
+      const exists = this.messages.some(m => m.tin_nhan_id === msg.tin_nhan_id);
+      if (exists) return;
+    }
+
+    this.messages.push(msg);
+  }
+
 }

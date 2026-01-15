@@ -42,6 +42,9 @@ export class AdminBoCauHoiEdit extends Base implements OnInit {
     },
   ];
 
+  showChuDeDropdown = false;
+  showCheDoDropdown = false;
+
   ngOnInit(): void {
     this.bo_cau_hoi_id = Number(this.route.snapshot.paramMap.get('id'));
     this.fetchChuDes();
@@ -137,5 +140,42 @@ export class AdminBoCauHoiEdit extends Base implements OnInit {
       default:
         return '';
     }
+  }
+
+  toggleChuDeDropdown() {
+    this.showChuDeDropdown = !this.showChuDeDropdown;
+    this.showCheDoDropdown = false; // Đóng cái kia nếu đang mở
+  }
+
+  selectChuDe(id: number) {
+    this.dto.chu_de_id = id;
+    this.showChuDeDropdown = false;
+  }
+
+  getSelectedChuDeName(): string {
+    if (!this.dto.chu_de_id) return '-- Chọn chủ đề --';
+    const selected = this.chu_des.find(c => c.id === this.dto.chu_de_id);
+    return selected ? selected.ten : '-- Chọn chủ đề --';
+  }
+
+  toggleCheDoDropdown() {
+    this.showCheDoDropdown = !this.showCheDoDropdown;
+    this.showChuDeDropdown = false;
+  }
+
+  selectCheDo(val: string) {
+    this.dto.che_do_hien_thi = val;
+    this.showCheDoDropdown = false;
+  }
+
+  getSelectedCheDoName(): string {
+    if (this.dto.che_do_hien_thi === 'RIENG_TU') return '🔒 Private (Dùng để tổ chức thi đấu)';
+    if (this.dto.che_do_hien_thi === 'CONG_KHAI') return '🌍 Public (Công khai cho mọi người)';
+    return '-- Chọn chế độ --';
+  }
+
+  closeAllDropdowns() {
+    this.showChuDeDropdown = false;
+    this.showCheDoDropdown = false;
   }
 }

@@ -36,8 +36,11 @@
   cursor: pointer;
   display: flex;
   gap: 6px;
-}
 
+}
+.mobile-only-logo {
+  display: none;
+}
 .logo-primary {
   color: var(--text-main);
 }
@@ -356,5 +359,106 @@
   }
   50% {
     transform: translateY(-3px);
+  }
+}
+
+
+/* --- MOBILE RESPONSIVE HEADER --- */
+@media (max-width: 992px) {
+  /* 1. Navbar Container: Giảm padding và chiều cao */
+  :host {
+    --nav-height: 60px; /* Thu nhỏ chiều cao header trên mobile */
+  }
+
+  .global-navbar {
+    padding: 0 16px; /* Giảm lề 40px -> 16px */
+    justify-content: space-between;
+  }
+
+  /* 2. Logo: Ẩn bớt chữ dài dòng */
+  .logo-primary,
+  .logo-accent {
+    display: none !important; /* Bỏ sạch chữ */
+  }
+
+  .mobile-only-logo {
+    display: block;
+    font-size: 2rem;
+    color: var(--primary);
+  }
+
+  /* 3. MENU DI CHUYỂN XUỐNG ĐÁY (BOTTOM NAVIGATION) */
+  .main-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 70px; /* Chiều cao thanh menu dưới */
+    background: #ffffff;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05); /* Bóng hắt lên trên */
+    z-index: 9999; /* Đảm bảo nổi lên trên cùng */
+
+    /* Căn chỉnh lại các item bên trong */
+    justify-content: space-evenly; /* Chia đều khoảng cách */
+    padding-bottom: env(safe-area-inset-bottom); /* Fix cho iPhone đời mới (không bị che bởi thanh vuốt home) */
+    gap: 0; /* Xóa gap cũ */
+  }
+
+  .nav-item {
+    flex-direction: column; /* Icon trên, chữ dưới */
+    gap: 4px;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 0.7rem; /* Chữ nhỏ lại */
+    color: #94a3b8;
+    background-color: transparent !important; /* Xóa background hover cũ */
+  }
+
+  .nav-item i {
+    font-size: 1.4rem; /* Phóng to icon cho dễ ấn */
+    margin-bottom: 0;
+    transform: none !important; /* Tắt hiệu ứng bay lên khi hover của Desktop */
+  }
+
+  /* Active state mobile: Chỉ đổi màu icon, không đổi nền */
+  .nav-item.active {
+    background-color: transparent;
+    color: var(--primary);
+    box-shadow: none;
+  }
+
+  /* Ẩn luôn chữ text menu nếu màn hình quá bé (< 380px) để tránh vỡ */
+  @media (max-width: 380px) {
+    .nav-item span {
+      display: none;
+    }
+  }
+
+  /* 4. User Profile: Ẩn tên, chỉ hiện Avatar */
+  .user-profile-actions {
+    gap: 10px; /* Giảm khoảng cách các icon */
+  }
+
+  .user-display-name,
+  .arrow-icon {
+    display: none; /* Ẩn tên user và mũi tên */
+  }
+
+  .streak-btn {
+    width: 32px;
+    height: 32px; /* Thu nhỏ nút lửa */
+  }
+
+  .nav-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Menu con dropdown của User cần chỉnh lại vị trí chút */
+  .user-menu {
+    top: 55px; /* Đẩy lên sát header mới */
+    right: 10px;
+    width: 200px;
   }
 }

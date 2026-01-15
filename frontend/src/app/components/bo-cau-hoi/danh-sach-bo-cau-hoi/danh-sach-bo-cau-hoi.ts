@@ -50,6 +50,9 @@ export class BoCauHoiList extends Base implements OnInit {
     {value: 2, label: '⭐ 2+ sao'},
     {value: 1, label: '⭐ 1+ sao'},
   ];
+  isMobileFilterOpen: boolean = false;
+  showChuDeDropdown: boolean = false;
+  showSortDropdown: boolean = false;
 
   ngOnInit() {
     this.currentUserId = this.tokenService.getUserId();
@@ -171,6 +174,8 @@ export class BoCauHoiList extends Base implements OnInit {
     this.chuDeId = 0;
     this.minRating = undefined;
     this.priceFilter = 'ALL';
+    this.loadData();
+    this.showChuDeDropdown = false; // Đóng dropdown nếu đang mở
     this.loadData();
   }
 
@@ -326,5 +331,49 @@ export class BoCauHoiList extends Base implements OnInit {
       })
       .then((r) => {
       });
+  }
+
+  toggleMobileFilter() {
+    this.isMobileFilterOpen = !this.isMobileFilterOpen;
+  }
+  toggleChuDeDropdown() {
+    this.showChuDeDropdown = !this.showChuDeDropdown;
+    if (this.showChuDeDropdown) this.showSortDropdown = false;
+  }
+  selectChuDe(id: number) {
+    this.chuDeId = id;
+    this.showChuDeDropdown = false;
+    this.applyFilter();
+    this.isMobileFilterOpen = !this.isMobileFilterOpen;
+  }
+  getSelectedChuDeName(): string {
+    if (this.chuDeId === 0) return '📚 Tất cả chủ đề';
+    const selected = this.chuDes.find(c => c.id === this.chuDeId);
+    return selected ? selected.ten : 'Chọn chủ đề';
+  }
+
+  toggleSortDropdown() {
+    this.showSortDropdown = !this.showSortDropdown;
+    if (this.showSortDropdown) this.showChuDeDropdown = false;
+  }
+
+  selectSortOrder(order: string) {
+    this.sortOrder = order;
+    this.showSortDropdown = false;
+    this.applyFilter();
+  }
+
+  getSelectedSortName(): string {
+    switch (this.sortOrder) {
+      case 'NEWEST': return '🕐 Mới nhất';
+      case 'OLDEST': return '📅 Cũ nhất';
+      case 'RATING_DESC': return '⭐ Đánh giá cao';
+      case 'RATING_ASC': return '⭐ Đánh giá thấp';
+      default: return 'Sắp xếp';
+    }
+  }
+  closeAllDropdowns() {
+    this.showChuDeDropdown = false;
+    this.showSortDropdown = false;
   }
 }

@@ -40,6 +40,9 @@ export class AdminBoCauHoiCreate extends Base implements OnInit {
     },
   ];
 
+  showChuDeDropdown = false;
+  showCheDoDropdown = false;
+
   ngOnInit(): void {
     this.loadChuDe();
   }
@@ -117,5 +120,42 @@ export class AdminBoCauHoiCreate extends Base implements OnInit {
       default:
         return '';
     }
+  }
+
+  toggleChuDeDropdown() {
+    this.showChuDeDropdown = !this.showChuDeDropdown;
+    this.showCheDoDropdown = false;
+  }
+
+  selectChuDe(id: number) {
+    this.form.chu_de_id = id;
+    this.showChuDeDropdown = false;
+  }
+
+  getSelectedChuDeName(): string {
+    if (!this.form.chu_de_id) return '-- Chọn chủ đề --';
+    const selected = this.chu_de_list.find(c => c.id === this.form.chu_de_id);
+    return selected ? selected.ten : '-- Chọn chủ đề --';
+  }
+
+  toggleCheDoDropdown() {
+    this.showCheDoDropdown = !this.showCheDoDropdown;
+    this.showChuDeDropdown = false;
+  }
+
+  selectCheDo(val: string) {
+    this.form.che_do_hien_thi = val;
+    this.showCheDoDropdown = false;
+  }
+
+  getSelectedCheDoName(): string {
+    if (this.form.che_do_hien_thi === 'RIENG_TU') return '🔒 Private (Dùng để tổ chức thi đấu)';
+    if (this.form.che_do_hien_thi === 'CONG_KHAI') return '🌍 Public (Công khai cho mọi người)';
+    return '-- Chọn chế độ --';
+  }
+
+  closeAllDropdowns() {
+    this.showChuDeDropdown = false;
+    this.showCheDoDropdown = false;
   }
 }

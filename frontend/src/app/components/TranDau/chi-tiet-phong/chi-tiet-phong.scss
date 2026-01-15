@@ -37,7 +37,7 @@
   justify-content: center;
   padding: 24px 16px 40px;
   background: radial-gradient(circle at 0% 0%, #e0f2fe 0, transparent 50%),
-    radial-gradient(circle at 100% 0%, #fef3c7 0, transparent 50%), #f3f4ff;
+  radial-gradient(circle at 100% 0%, #fef3c7 0, transparent 50%), #f3f4ff;
   position: relative;
 }
 
@@ -307,7 +307,7 @@
 
 .pre-countdown-card {
   background: radial-gradient(circle at 0 0, #fee2e2, transparent 55%),
-    radial-gradient(circle at 100% 100%, #dbeafe, transparent 55%), #ffffff;
+  radial-gradient(circle at 100% 100%, #dbeafe, transparent 55%), #ffffff;
   border-radius: 24px;
   padding: 26px 32px 24px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
@@ -1344,15 +1344,49 @@
 
 /* --- SUMMARY SCREEN (PODIUM STYLE) --- */
 .summary-screen {
-  background: #ffffff; /* Nền trắng sạch sẽ như ảnh gốc của bạn */
+  background: #ffffff;
   border-radius: 24px;
   padding: 30px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   text-align: center;
   max-width: 900px;
+  width: 100%; /* Đảm bảo không tràn */
   margin: 0 auto;
   position: relative;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    padding: 20px 15px;
+    border-radius: 0; /* Full màn hình mobile thì bỏ bo góc hoặc giảm */
+    min-height: 100vh; /* Chiếm hết màn hình */
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.summary-header {
+  h2 {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #6c5dd3;
+    margin: 0 0 5px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    @media (max-width: 768px) {
+      font-size: 1.5rem; /* Giảm size chữ tiêu đề */
+    }
+  }
+
+  p {
+    color: #808191;
+    margin: 0 0 40px 0;
+
+    @media (max-width: 768px) {
+      margin-bottom: 20px; /* Giảm khoảng cách */
+      font-size: 0.9rem;
+    }
+  }
 }
 
 .summary-header h2 {
@@ -1376,7 +1410,14 @@
   align-items: flex-end;
   gap: 15px;
   margin-bottom: 40px;
-  height: 350px; /* Chiều cao cố định để căn đáy */
+  height: 350px;
+
+  @media (max-width: 768px) {
+    height: auto; /* Chiều cao tự động */
+    min-height: 280px;
+    gap: 8px; /* Giảm khoảng cách giữa các cột */
+    margin-bottom: 20px;
+  }
 }
 
 .podium-item {
@@ -1385,7 +1426,19 @@
   align-items: center;
   width: 120px;
   position: relative;
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* Mobile: Giảm chiều rộng cột */
+  @media (max-width: 768px) {
+    width: 30%; /* Chia đều 3 cột, mỗi cột 30% */
+  }
+
+  /* Ẩn bớt hiệu ứng hover trên mobile */
+  @media (min-width: 769px) {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
 }
 
 .podium-item:hover {
@@ -1396,32 +1449,46 @@
 .avatar-box {
   position: relative;
   margin-bottom: 10px;
-}
 
-.avatar-box .avatar {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid white;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
+  .avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 
-.avatar-box .badge {
-  position: absolute;
-  bottom: -5px;
-  right: -5px;
-  width: 24px;
-  height: 24px;
-  background: #333;
-  color: white;
-  border-radius: 50%;
-  font-weight: 700;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid white;
+    @media (max-width: 768px) {
+      width: 50px;
+      height: 50px;
+      border-width: 2px;
+    }
+  }
+
+  .badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 24px;
+    height: 24px;
+    background: #333;
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+
+    @media (max-width: 768px) {
+      width: 20px;
+      height: 20px;
+      font-size: 10px;
+      bottom: -2px;
+      right: -2px;
+    }
+  }
 }
 
 /* Info Text */
@@ -1434,19 +1501,44 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem; /* Tên nhỏ lại */
+    max-width: 80px;
+  }
 }
 
-.p-score {
-  font-weight: 800;
-  color: #6c5dd3;
-  font-size: 1rem;
-  margin-bottom: 5px;
+.p-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem; /* Tên nhỏ lại */
+    max-width: 80px;
+  }
 }
 
 /* Podium Bars (Chiều cao khác nhau) */
-.podium-bar {
-  width: 100%;
-  border-radius: 12px 12px 0 0;
+.p-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem; /* Tên nhỏ lại */
+    max-width: 80px;
+  }
 }
 
 /* --- RANK STYLES --- */
@@ -1458,77 +1550,123 @@
 }
 
 /* Đứng giữa */
-.rank-1 .avatar-box .avatar {
-  width: 100px;
-  height: 100px;
-  border-color: #ffd700;
-}
+.rank-1 {
+  order: 2;
+  z-index: 2;
 
-.rank-1 .avatar-box .badge {
-  background: #ffd700;
-  color: #b45309;
-  width: 30px;
-  height: 30px;
-  font-size: 14px;
-}
+  .avatar-box .avatar {
+    width: 100px;
+    height: 100px;
+    border-color: #ffd700;
 
-.rank-1 .podium-bar {
-  height: 160px; /* Cao nhất */
-  background: linear-gradient(180deg, #ffd700 0%, #f59e0b 100%);
-  box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
-}
+    @media (max-width: 768px) {
+      width: 75px;
+      height: 75px;
+    }
+  }
 
-.crown-icon {
-  font-size: 3rem;
-  position: absolute;
-  top: -50px;
-  animation: float 2s infinite ease-in-out;
+  .avatar-box .badge {
+    background: #ffd700;
+    color: #b45309;
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+
+    @media (max-width: 768px) {
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+    }
+  }
+
+  .podium-bar {
+    height: 160px;
+    background: linear-gradient(180deg, #ffd700 0%, #f59e0b 100%);
+    box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+    @media (max-width: 768px) {
+      height: 120px; /* Giảm chiều cao cột trên mobile */
+    }
+  }
+
+  .crown-icon {
+    font-size: 3rem;
+    position: absolute;
+    top: -50px;
+    animation: float 2s infinite ease-in-out;
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+      top: -35px;
+    }
+  }
 }
 
 /* Rank 2 */
 .rank-2 {
   order: 1;
-}
 
-/* Bên trái */
-.rank-2 .avatar-box .avatar {
-  border-color: #c0c0c0;
-}
+  .avatar-box .avatar {
+    border-color: #c0c0c0;
+  }
 
-.rank-2 .avatar-box .badge {
-  background: #c0c0c0;
-  color: #4b5563;
-}
+  .avatar-box .badge {
+    background: #c0c0c0;
+    color: #4b5563;
+  }
 
-.rank-2 .podium-bar {
-  height: 110px;
-  background: linear-gradient(180deg, #e5e7eb 0%, #9ca3af 100%);
+  .podium-bar {
+    height: 110px;
+    background: linear-gradient(180deg, #e5e7eb 0%, #9ca3af 100%);
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+    @media (max-width: 768px) {
+      height: 80px;
+    }
+  }
 }
 
 /* Rank 3 */
 .rank-3 {
   order: 3;
-}
 
-/* Bên phải */
-.rank-3 .avatar-box .avatar {
-  border-color: #cd7f32;
-}
+  .avatar-box .avatar {
+    border-color: #cd7f32;
+  }
 
-.rank-3 .avatar-box .badge {
-  background: #cd7f32;
-  color: #78350f;
-}
+  .avatar-box .badge {
+    background: #cd7f32;
+    color: #78350f;
+  }
 
-.rank-3 .podium-bar {
-  height: 70px;
-  background: linear-gradient(180deg, #fdba74 0%, #ea580c 100%);
+  .podium-bar {
+    height: 70px;
+    background: linear-gradient(180deg, #fdba74 0%, #ea580c 100%);
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+    @media (max-width: 768px) {
+      height: 50px;
+    }
+  }
 }
 
 /* Empty slots */
 .podium-item.empty {
   opacity: 0.3;
   filter: grayscale(1);
+  /* Ẩn bớt avatar placeholder nếu trống để đỡ rối */
+  .avatar {
+    opacity: 0.5;
+  }
+
+  .p-name {
+    display: none;
+  }
+
+  .p-score {
+    display: none;
+  }
 }
 
 /* --- REST LIST (Hạng 4+) --- */
@@ -1592,7 +1730,15 @@
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin-top: 20px;
+  margin-top: auto; /* Đẩy xuống đáy nếu container là flex column */
+  padding-top: 20px;
+
+  /* Mobile: Xếp dọc các nút */
+  @media (max-width: 768px) {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
 }
 
 .btn-action {
@@ -1602,30 +1748,33 @@
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center; /* Căn giữa nội dung nút */
   gap: 8px;
-  transition: 0.2s;
   border: none;
-}
+  font-size: 1rem;
 
-.btn-action:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
+  /* Mobile: Nút full width */
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 14px; /* Nút to hơn để dễ bấm */
+  }
 
-.btn-action.primary {
-  background: #6c5dd3;
-  color: white;
-}
+  &.primary {
+    background: #6c5dd3;
+    color: white;
+    box-shadow: 0 4px 15px rgba(108, 93, 211, 0.4);
+  }
 
-.btn-action.secondary {
-  background: #e4e5ee;
-  color: #333;
-}
+  &.secondary {
+    background: #e4e5ee;
+    color: #333;
+  }
 
-.btn-action.outline {
-  background: transparent;
-  border: 2px solid #e4e5ee;
-  color: #808191;
+  &.outline {
+    background: transparent;
+    border: 2px solid #e4e5ee;
+    color: #808191;
+  }
 }
 
 @keyframes float {
@@ -2290,5 +2439,243 @@
       box-shadow: 0 5px 15px rgba(108, 93, 211, 0.4);
       transform: translateY(-2px);
     }
+  }
+}
+
+/* ================== LEADERBOARD SIDEBAR MODE ================== */
+
+.leaderboard.sidebar-mode {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 20px;
+  /* Animation xuất hiện nhẹ nhàng */
+  animation: fadeIn 0.5s ease-out;
+
+  .lb-header {
+    background: linear-gradient(to right, #4f46e5, #6366f1);
+    padding: 12px 16px;
+
+    h3 {
+      margin: 0;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  .lb-scroll-wrap {
+    max-height: 300px; /* Giới hạn chiều cao nếu danh sách dài */
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+  }
+
+  .ranking {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: #f8fafc;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+      th {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+    }
+
+    tbody td {
+      padding: 10px;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+    }
+
+    /* Hiệu ứng dòng của bản thân */
+    tr.is-me {
+      background-color: #f0fdf4; /* Xanh lá nhạt */
+      td {
+        color: #15803d;
+        font-weight: 600;
+      }
+    }
+
+    /* Rank Chips màu mè */
+    .rank-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #475569;
+
+      &.top1 {
+        background: #fbbf24;
+        color: #78350f;
+        box-shadow: 0 2px 5px rgba(251, 191, 36, 0.4);
+      }
+
+      &.top2 {
+        background: #94a3b8;
+        color: #fff;
+      }
+
+      &.top3 {
+        background: #d97706;
+        color: #fff;
+      }
+    }
+
+    .name-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .truncate {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+/* =========================================================
+   RESPONSIVE MOBILE (@media queries)
+   Thêm đoạn này vào cuối file chi-tiet-phong.scss
+   ========================================================= */
+
+@media (max-width: 992px) {
+  /* 1. Xử lý Layout chính: Chuyển từ 2 cột (Game | Sidebar) sang 1 cột dọc */
+  .page {
+    padding-bottom: 100px !important;
+  }
+  .game-layout {
+    grid-template-columns: 1fr !important; /* Bắt buộc 1 cột */
+    gap: 20px;
+  }
+
+  /* Đẩy Sidebar (Chat/BXH) xuống dưới cùng */
+  .game-sidebar {
+    order: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  /* 2. Header: Tiêu đề và thông tin trận đấu xếp dọc */
+  .header {
+    .title {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+
+      h1 {
+        font-size: 1.8rem; /* Giảm size chữ tiêu đề */
+      }
+    }
+
+    .meta {
+      grid-template-columns: 1fr; /* Thông tin (Chế độ, Bộ câu hỏi...) xếp dọc 1 hàng */
+      gap: 8px;
+    }
+  }
+
+  /* 3. Nút bấm (Actions): Xếp dọc để dễ bấm, không bị ép ngang */
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    .left, .right {
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+
+      /* Nút bấm full chiều ngang trên mobile */
+      .btn, .pin {
+        flex: 1;
+        width: 100%;
+        margin-bottom: 5px;
+      }
+
+      /* Riêng ô nhập PIN */
+      .pin {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  }
+
+  /* 4. Trạng thái (4 ô vuông): Chuyển từ 4 cột sang 2x2 */
+  .play .grid {
+    grid-template-columns: repeat(2, 1fr) !important; /* Mỗi hàng 2 ô */
+  }
+
+  /* 5. Đáp án A-B-C-D: Chuyển thành 1 cột dọc để không bị ngắn quá */
+  .choices {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Tăng chiều cao nút chọn để dễ bấm ngón tay */
+  .choice {
+    min-height: 55px;
+    padding: 8px 12px;
+  }
+
+  /* 6. Chat Room: Giảm chiều cao cho đỡ chiếm màn hình */
+  .chat-panel {
+    height: 350px;
+  }
+
+  /* 7. Modal User: Full màn hình trên mobile */
+  .modal-glass {
+    width: 95%;
+    padding: 20px;
+    max-height: 80vh;
+  }
+}
+
+/* Màn hình siêu nhỏ (iPhone SE, Galaxy Fold...) */
+@media (max-width: 480px) {
+  .container {
+    padding: 15px; /* Giảm padding khung chính */
+  }
+
+  .play .cell .value {
+    font-size: 0.95rem; /* Giảm font chữ các ô điểm số */
+  }
+}
+
+@media (max-width: 550px) {
+  .music-toggle-btn {
+    bottom: 100px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
   }
 }

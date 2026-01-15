@@ -54,6 +54,9 @@ export class AdminCommunityComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
+  showStatusDropdown = false;
+
+
   constructor(private communityService: CommunityService) {
   }
 
@@ -293,5 +296,32 @@ export class AdminCommunityComponent implements OnInit, OnDestroy {
       return this.imageBaseURL + filename;
     }
     return 'assets/images/default-avatar.png';
+  }
+
+  toggleStatusDropdown() {
+    this.showStatusDropdown = !this.showStatusDropdown;
+  }
+
+  selectReportStatus(status: any) {
+    this.reportStatus = status;
+    this.showStatusDropdown = false;
+    this.onReportStatusChange();
+  }
+
+  getReportStatusDisplay(): string {
+    switch (this.reportStatus) {
+      case 'ALL':
+        return 'Tất cả trạng thái';
+      case 'CHO_XU_LY':
+        return 'Chờ xử lý';
+      case 'DA_XU_LY':
+        return 'Đã xử lý';
+      default:
+        return 'Trạng thái';
+    }
+  }
+
+  closeDropdown() {
+    this.showStatusDropdown = false;
   }
 }

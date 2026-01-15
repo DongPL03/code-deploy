@@ -394,10 +394,10 @@
   width: 50%;
   height: 100%;
   background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(255, 255, 255, 0) 100%
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%
   );
   transform: skewX(-25deg);
   animation: shine 3s infinite;
@@ -836,5 +836,104 @@
 
   &.teal i {
     color: #009688;
+  }
+}
+
+/* --- MOBILE & TABLET RESPONSIVE FIX --- */
+@media (max-width: 992px) {
+  .game-dashboard {
+    padding: 16px; /* Giảm lề ngoài để có thêm diện tích hiển thị */
+    padding-bottom: 100px !important;
+  }
+
+  /* Chuyển layout từ ngang sang dọc */
+  .main-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Đảo vị trí: Đưa nội dung chính (Nút chơi) lên TRÊN, Sidebar (Thông tin) xuống DƯỚI */
+  /* Nếu bạn muốn giữ Sidebar ở trên thì xóa đoạn code order này đi */
+  .content-panel {
+    order: 1;
+  }
+  .sidebar-panel {
+    order: 2;
+  }
+
+  /* Sidebar dàn ngang trên Tablet/Mobile */
+  .sidebar-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* Stats grid (Vàng, Điểm, Hạng) giữ 2 cột nhưng giảm khoảng cách */
+  .stats-grid {
+    gap: 10px;
+  }
+
+  /* Nút tìm trận lớn */
+  .btn-battle-big {
+    padding: 20px;
+    font-size: 1.2rem;
+  }
+
+  .btn-battle-big i {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Tinh chỉnh riêng cho điện thoại nhỏ */
+  .hero-header h1 {
+    font-size: 1.5rem; /* Giảm cỡ chữ tiêu đề */
+  }
+
+  .hero-header p {
+    font-size: 0.95rem;
+  }
+
+  /* Grid nút truy cập nhanh: Chuyển về 2 cột cố định để đều đẹp trên mobile */
+  .quick-access-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .btn-quick-access {
+    padding: 15px 5px;
+  }
+
+  /* Feed list (Vừa diễn ra) */
+  .feed-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .feed-status {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  /* Điều chỉnh nút nhạc để không che nội dung */
+  //.music-toggle-btn {
+  //  width: 40px;
+  //  height: 40px;
+  //  bottom: 15px;
+  //  right: 15px;
+  //  font-size: 1rem;
+  //}
+
+}
+
+@media (max-width: 550px) {
+  .music-toggle-btn {
+    bottom: 100px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
   }
 }

@@ -540,7 +540,7 @@ public class TranDauService implements ITranDauService {
 
         // 🔟 Cập nhật và broadcast leaderboard tổng thể
 //        updateAndBroadcastLeaderboard(td.getId(), state);
-        updateAndBroadcastLeaderboard(td.getId());
+//        updateAndBroadcastLeaderboard(td.getId());
         // 1️⃣1️⃣ Trả response cho client
         return SubmitAnswerResponse.builder()
                 .correct(correct)
@@ -1576,6 +1576,36 @@ public class TranDauService implements ITranDauService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void processQuestionTimeout(Long tranDauId) {
+        try {
+            BattleState state = battleStateManager.get(tranDauId);
+            if (state == null) return;
+
+            int idx = state.getCurrentQuestionIndex();
+            if (idx >= 0 && idx < state.getDanhSachCauHoi().size()) {
+                CauHoiCacheDTO q = state.getDanhSachCauHoi().get(idx);
+
+                // Gửi sự kiện ANSWER_REVEAL qua Socket
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("type", "ANSWER_REVEAL");
+                payload.put("tran_dau_id", tranDauId);
+                payload.put("question_index", idx);
+                payload.put("dap_an_dung", q.getDapAnDung());
+                payload.put("giai_thich", q.getGiaiThich());
+
+                wsPublisher.publishGeneric(tranDauId, "ANSWER_REVEAL", payload);
+            }
+
+            // Bây giờ mới gửi Bảng xếp hạng cập nhật
+            updateAndBroadcastLeaderboard(tranDauId, state);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi xử lý timeout câu hỏi: " + e.getMessage());
+        }
     }
 
 }

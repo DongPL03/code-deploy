@@ -689,3 +689,220 @@ mark {
     justify-content: center;
   }
 }
+
+/* --- Ẩn icon toggle trên Desktop --- */
+.mobile-toggle-icon {
+  display: none;
+}
+
+/* --- MOBILE RESPONSIVE (KHO TÀNG TRI THỨC) --- */
+@media (max-width: 992px) {
+
+  /* 1. Layout & Padding: Né menu bottom */
+  .inventory-container {
+    padding: 15px;
+    padding-bottom: 110px !important; /* QUAN TRỌNG */
+  }
+
+  .inventory-layout {
+    grid-template-columns: 1fr; /* 1 cột duy nhất */
+    gap: 20px;
+  }
+
+  /* 2. Header: Gọn gàng hơn */
+  .inventory-header {
+    flex-direction: column;
+    align-items: stretch; /* Kéo dãn full chiều ngang */
+    gap: 15px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .header-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .btn-hero-3d {
+    width: 100%; /* Nút tạo to dễ bấm */
+    justify-content: center;
+  }
+
+  /* 3. BỘ LỌC ĐÓNG/MỞ (COLLAPSIBLE) */
+  .control-panel {
+    padding: 15px;
+    position: relative; /* Bỏ sticky */
+    top: 0;
+  }
+
+  .panel-header {
+    margin-bottom: 0;
+    justify-content: space-between;
+    cursor: pointer; /* Bấm được */
+    padding: 5px 0;
+  }
+
+  .mobile-toggle-icon {
+    display: block; /* Hiện mũi tên */
+    font-size: 1rem;
+    color: var(--text-muted);
+    transition: transform 0.3s;
+  }
+
+  .mobile-toggle-icon.rotate {
+    transform: rotate(180deg); /* Xoay khi mở */
+  }
+
+  /* Mặc định ẩn nội dung bộ lọc */
+  .filter-content {
+    display: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #eee;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  /* Hiện khi biến active = true */
+  .filter-content.show-mobile {
+    display: block;
+  }
+
+  /* 4. Grid Cards */
+  .card-grid {
+    grid-template-columns: 1fr; /* Mỗi hàng 1 thẻ */
+  }
+
+  /* 5. Tinh chỉnh thẻ Card cho gọn */
+  .skill-card {
+    margin-bottom: 0;
+  }
+
+  /* Nút hành động trong card to ra cho dễ bấm */
+  .card-actions {
+    justify-content: space-between;
+  }
+
+  .btn-play {
+    flex-grow: 2; /* Nút Luyện tập dài gấp đôi các nút khác */
+  }
+}
+
+/* Animation trượt xuống nhẹ nhàng */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- CUSTOM DROPDOWN STYLE --- */
+.custom-dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-trigger {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid #f0f2f5;
+  background: white;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.dropdown-trigger:hover {
+  border-color: #d1d5db;
+}
+
+/* Mũi tên xoay khi mở */
+.dropdown-trigger .arrow {
+  transition: transform 0.3s;
+}
+
+.dropdown-trigger .arrow.rotate {
+  transform: rotate(180deg);
+}
+
+/* Danh sách xổ xuống */
+.dropdown-options-list {
+  position: absolute;
+  top: 110%; /* Cách nút một chút */
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15); /* Bóng đổ đậm đà */
+  z-index: 1000; /* Nổi lên trên cùng */
+  max-height: 250px; /* Giới hạn chiều cao */
+  overflow-y: auto; /* Cho phép cuộn */
+  padding: 5px;
+  border: 1px solid #f0f2f5;
+}
+
+/* Tùy chỉnh thanh cuộn cho đẹp */
+.dropdown-options-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.dropdown-options-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+/* Từng dòng option */
+.dropdown-item {
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #f3f4f6;
+  color: var(--primary);
+}
+
+.dropdown-item.active {
+  background: #eef2ff;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+/* Backdrop để xử lý click ra ngoài */
+.backdrop-click {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999; /* Nằm dưới dropdown list nhưng trên các cái khác */
+  background: transparent;
+  cursor: default;
+}
+
+/* Animation */
+.animate-fade-down {
+  animation: fadeDownSelect 0.2s ease-out;
+}
+
+@keyframes fadeDownSelect {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

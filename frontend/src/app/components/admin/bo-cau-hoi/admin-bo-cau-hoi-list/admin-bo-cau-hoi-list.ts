@@ -1,13 +1,13 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import {CommonModule} from '@angular/common';
+import {Component, OnInit} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
-import { ChuDe } from '../../../../models/chude';
-import { BoCauHoiResponse } from '../../../../responses/bocauhoi/bocauhoi-response';
-import { PageResponse } from '../../../../responses/page-response';
-import { ResponseObject } from '../../../../responses/response-object';
-import { Base } from '../../../base/base';
+import {ChuDe} from '../../../../models/chude';
+import {BoCauHoiResponse} from '../../../../responses/bocauhoi/bocauhoi-response';
+import {PageResponse} from '../../../../responses/page-response';
+import {ResponseObject} from '../../../../responses/response-object';
+import {Base} from '../../../base/base';
 
 @Component({
   selector: 'app-admin-bo-cau-hoi-list',
@@ -38,32 +38,40 @@ export class AdminBoCauHoiList extends Base implements OnInit {
   selectedItems: Set<number> = new Set();
   statistics: any = null;
 
-  showAdvancedFilter = false; // Biến toggle filter
+  showAdvancedFilter = false;
 
   readonly trangThaiOptions = [
-    { value: 'CHO_DUYET', label: 'Chờ duyệt' },
-    { value: 'DA_DUYET', label: 'Đã duyệt' },
-    { value: 'TU_CHOI', label: 'Từ chối' },
-    { value: '', label: 'Tất cả' },
+    {value: 'CHO_DUYET', label: 'Chờ duyệt'},
+    {value: 'DA_DUYET', label: 'Đã duyệt'},
+    {value: 'TU_CHOI', label: 'Từ chối'},
+    {value: '', label: 'Tất cả'},
   ];
 
   readonly loaiSuDungOptions = [
-    { value: '', label: 'Tất cả' },
-    { value: 'CHI_XEP_HANG', label: 'Chỉ xếp hạng' },
-    { value: 'CHI_THUONG', label: 'Chỉ thường' },
-    { value: 'CHI_LUYEN_TAP', label: 'Chỉ luyện tập' },
+    {value: '', label: 'Tất cả'},
+    {value: 'CHI_XEP_HANG', label: 'Chỉ xếp hạng'},
+    {value: 'CHI_THUONG', label: 'Chỉ thường'},
+    {value: 'CHI_LUYEN_TAP', label: 'Chỉ luyện tập'},
   ];
 
   readonly loaiOptions = [
-    { value: undefined, label: 'Tất cả' },
-    { value: true, label: 'Trả phí' },
-    { value: false, label: 'Miễn phí' },
+    {value: undefined, label: 'Tất cả'},
+    {value: true, label: 'Trả phí'},
+    {value: false, label: 'Miễn phí'},
   ];
 
   readonly sortOptions = [
-    { value: 'NEWEST', label: 'Mới nhất' },
-    { value: 'OLDEST', label: 'Cũ nhất' },
+    {value: 'NEWEST', label: 'Mới nhất'},
+    {value: 'OLDEST', label: 'Cũ nhất'},
   ];
+
+  showStatusDropdown = false;
+  showChuDeDropdown = false;
+
+  // Dropdown trong bộ lọc nâng cao
+  showUsageDropdown = false;
+  showFeeDropdown = false;
+  showSortDropdown = false;
 
   ngOnInit(): void {
     this.loadChuDe();
@@ -77,7 +85,8 @@ export class AdminBoCauHoiList extends Base implements OnInit {
         this.chuDes = res.data || [];
       },
       error: () => {
-        Swal.fire('Lỗi', 'Không thể tải danh sách chủ đề', 'error').then((r) => {});
+        Swal.fire('Lỗi', 'Không thể tải danh sách chủ đề', 'error').then((r) => {
+        });
       },
     });
   }
@@ -88,7 +97,7 @@ export class AdminBoCauHoiList extends Base implements OnInit {
       .getAll(
         this.keyword,
         this.chuDeId,
-        '', // che_do_hien_thi: để backend tự xử lý
+        '',
         this.trangThai,
         this.loaiSuDung,
         this.muonTaoTraPhi,
@@ -107,7 +116,8 @@ export class AdminBoCauHoiList extends Base implements OnInit {
         },
         error: () => {
           this.loading = false;
-          Swal.fire('Lỗi', 'Không thể tải danh sách bộ câu hỏi', 'error').then((r) => {});
+          Swal.fire('Lỗi', 'Không thể tải danh sách bộ câu hỏi', 'error').then((r) => {
+          });
         },
       });
   }
@@ -150,10 +160,10 @@ export class AdminBoCauHoiList extends Base implements OnInit {
         <p><strong>Bộ câu hỏi:</strong> ${quiz.tieu_de}</p>
         <p><strong>Số câu hỏi:</strong> ${soCau} câu</p>
         <p><strong>Người tạo muốn:</strong> ${
-          muonTraPhi
-            ? '<span style="color: #ff9800;">💰 Trả phí</span>'
-            : '<span style="color: #4caf50;">🎁 Miễn phí</span>'
-        }</p>
+      muonTraPhi
+        ? '<span style="color: #ff9800;">💰 Trả phí</span>'
+        : '<span style="color: #4caf50;">🎁 Miễn phí</span>'
+    }</p>
     `;
 
     if (muonTraPhi && soCau > 0) {
@@ -163,8 +173,8 @@ export class AdminBoCauHoiList extends Base implements OnInit {
           <p style="margin: 0; font-size: 1.2em; color: #ff6f00;"><strong>${giaGoiY} vàng</strong></p>
           <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #666;">
             (Dựa trên số câu hỏi: ${
-              soCau < 20 ? '< 20 câu = 50G' : soCau < 50 ? '20-49 câu = 100G' : '≥ 50 câu = 150G'
-            })
+        soCau < 20 ? '< 20 câu = 50G' : soCau < 50 ? '20-49 câu = 100G' : '≥ 50 câu = 150G'
+      })
           </p>
           <p style="margin: 10px 0 0 0; font-size: 0.85em; color: #666;">
             <i class="fas fa-info-circle"></i> Người tạo sẽ nhận <strong>70%</strong> số vàng mỗi khi có người chơi mở khóa.
@@ -205,12 +215,14 @@ export class AdminBoCauHoiList extends Base implements OnInit {
 
       this.bocauHoiService.approveBoCauHoi(quiz.id).subscribe({
         next: (res: ResponseObject<BoCauHoiResponse>) => {
-          Swal.fire('Thành công', res.message || 'Đã duyệt bộ câu hỏi', 'success').then((r) => {});
+          Swal.fire('Thành công', res.message || 'Đã duyệt bộ câu hỏi', 'success').then((r) => {
+          });
           this.loadData();
         },
         error: (err) => {
           const msg = err?.error?.message || 'Không thể duyệt bộ câu hỏi';
-          Swal.fire('Lỗi', msg, 'error').then((r) => {});
+          Swal.fire('Lỗi', msg, 'error').then((r) => {
+          });
         },
       });
     });
@@ -239,13 +251,15 @@ export class AdminBoCauHoiList extends Base implements OnInit {
       this.bocauHoiService.rejectBoCauHoi(quiz.id, reason).subscribe({
         next: (res: ResponseObject<BoCauHoiResponse>) => {
           Swal.fire('Đã từ chối', res.message || 'Đã từ chối bộ câu hỏi', 'success').then(
-            (r) => {}
+            (r) => {
+            }
           );
           this.loadData();
         },
         error: (err) => {
           const msg = err?.error?.message || 'Không thể từ chối bộ câu hỏi';
-          Swal.fire('Lỗi', msg, 'error').then((r) => {});
+          Swal.fire('Lỗi', msg, 'error').then((r) => {
+          });
         },
       });
     });
@@ -253,14 +267,16 @@ export class AdminBoCauHoiList extends Base implements OnInit {
 
   navigateDetail(id: number) {
     // Angular Router tự ghép mảng thành url /admin/bo-cau-hoi/123
-    this.router.navigate(['/admin/bo-cau-hoi', id]).then((r) => {});
+    this.router.navigate(['/admin/bo-cau-hoi', id]).then((r) => {
+    });
   }
 
   goToCreateAdminBo(): void {
     console.log('Navigate to create new Bo Cau Hoi');
     // this.router.navigate('/admin/bo-cau-hoi/tao-moi').then(r => {
     // });
-    this.router.navigate(['/admin/bo-cau-hoi/tao-moi']).then((r) => {});
+    this.router.navigate(['/admin/bo-cau-hoi/tao-moi']).then((r) => {
+    });
   }
 
   // Bulk actions
@@ -306,10 +322,10 @@ export class AdminBoCauHoiList extends Base implements OnInit {
             html: `
               <p>Đã duyệt thành công: <strong>${data.successCount}</strong> bộ câu hỏi</p>
               ${
-                data.failCount > 0
-                  ? `<p>Thất bại: <strong>${data.failCount}</strong> bộ câu hỏi</p>`
-                  : ''
-              }
+              data.failCount > 0
+                ? `<p>Thất bại: <strong>${data.failCount}</strong> bộ câu hỏi</p>`
+                : ''
+            }
             `,
             icon: data.failCount > 0 ? 'warning' : 'success',
           });
@@ -354,10 +370,10 @@ export class AdminBoCauHoiList extends Base implements OnInit {
             html: `
               <p>Đã từ chối thành công: <strong>${data.successCount}</strong> bộ câu hỏi</p>
               ${
-                data.failCount > 0
-                  ? `<p>Thất bại: <strong>${data.failCount}</strong> bộ câu hỏi</p>`
-                  : ''
-              }
+              data.failCount > 0
+                ? `<p>Thất bại: <strong>${data.failCount}</strong> bộ câu hỏi</p>`
+                : ''
+            }
             `,
             icon: data.failCount > 0 ? 'warning' : 'success',
           });
@@ -403,6 +419,111 @@ export class AdminBoCauHoiList extends Base implements OnInit {
   }
 
   navigateEdit(id: number) {
-    this.router.navigate(['/admin/bo-cau-hoi/sua-bo-cau-hoi', id]).then((r) => {});
+    this.router.navigate(['/admin/bo-cau-hoi/sua-bo-cau-hoi', id]).then((r) => {
+    });
+  }
+
+  closeAllDropdowns() {
+    this.showStatusDropdown = false;
+    this.showChuDeDropdown = false;
+    this.showUsageDropdown = false;
+    this.showFeeDropdown = false;
+    this.showSortDropdown = false;
+  }
+
+  // --- XỬ LÝ DROPDOWN TRẠNG THÁI ---
+  toggleStatusDropdown() {
+    const wasOpen = this.showStatusDropdown;
+    this.closeAllDropdowns();
+    this.showStatusDropdown = !wasOpen;
+  }
+
+  selectStatus(val: string) {
+    this.trangThai = val;
+    this.closeAllDropdowns();
+    this.page = 0;
+    this.loadData();
+  }
+
+  getStatusDisplay(): string {
+    const found = this.trangThaiOptions.find(o => o.value === this.trangThai);
+    return found ? found.label : 'Trạng thái';
+  }
+
+  // --- XỬ LÝ DROPDOWN CHỦ ĐỀ ---
+  toggleChuDeDropdown() {
+    const wasOpen = this.showChuDeDropdown;
+    this.closeAllDropdowns();
+    this.showChuDeDropdown = !wasOpen;
+  }
+
+  selectChuDe(id: number) {
+    this.chuDeId = id;
+    this.closeAllDropdowns();
+    this.page = 0;
+    this.loadData();
+  }
+
+  getChuDeDisplay(): string {
+    if (this.chuDeId === 0) return 'Tất cả chủ đề';
+    const found = this.chuDes.find(c => c.id === this.chuDeId);
+    return found ? found.ten : 'Tất cả chủ đề';
+  }
+
+  // --- XỬ LÝ DROPDOWN LOẠI SỬ DỤNG ---
+  toggleUsageDropdown() {
+    const wasOpen = this.showUsageDropdown;
+    this.closeAllDropdowns();
+    this.showUsageDropdown = !wasOpen;
+  }
+
+  selectUsage(val: string) {
+    this.loaiSuDung = val;
+    this.closeAllDropdowns();
+    this.page = 0;
+    this.loadData();
+  }
+
+  getUsageDisplay(): string {
+    const found = this.loaiSuDungOptions.find(o => o.value === this.loaiSuDung);
+    return found ? found.label : 'Tất cả';
+  }
+
+  // --- XỬ LÝ DROPDOWN PHÍ ---
+  toggleFeeDropdown() {
+    const wasOpen = this.showFeeDropdown;
+    this.closeAllDropdowns();
+    this.showFeeDropdown = !wasOpen;
+  }
+
+  selectFee(val: boolean | undefined) {
+    this.muonTaoTraPhi = val;
+    this.closeAllDropdowns();
+    this.page = 0;
+    this.loadData();
+  }
+
+  getFeeDisplay(): string {
+    const found = this.loaiOptions.find(o => o.value === this.muonTaoTraPhi);
+    return found ? found.label : 'Tất cả';
+  }
+
+  // --- XỬ LÝ DROPDOWN SẮP XẾP ---
+  toggleSortDropdown() {
+    const wasOpen = this.showSortDropdown;
+    this.closeAllDropdowns();
+    this.showSortDropdown = !wasOpen;
+  }
+
+  selectSort(val: string) {
+    this.sortOrder = val;
+    this.closeAllDropdowns();
+    this.page = 0;
+    this.loadData();
+  }
+
+  getSortDisplay(): string {
+    const found = this.sortOptions.find(o => o.value === this.sortOrder);
+    return found ? found.label : 'Mới nhất';
   }
 }

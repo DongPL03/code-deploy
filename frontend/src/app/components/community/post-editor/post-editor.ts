@@ -288,16 +288,12 @@ export class PostEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   // Submit
   async submit(): Promise<void> {
     if (!this.isValid || this.isSubmitting) return;
-
     this.isSubmitting = true;
-
     try {
       // Upload new images first
       const imagesToUpload = this.uploadedImages.filter((img) => !img.uploaded);
-
       if (imagesToUpload.length > 0) {
         this.isUploading = true;
-
         for (const img of imagesToUpload) {
           try {
             const response = await this.communityService.uploadImage(img.file).toPromise();
@@ -309,7 +305,6 @@ export class PostEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             console.error('Failed to upload image:', error);
           }
         }
-
         this.isUploading = false;
       }
 
@@ -334,7 +329,7 @@ export class PostEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
       request.pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
-          if (response.status === 'OK' && response.data) {
+          if (response.status === 'CREATED' && response.data) {
             this.isDirty = false;
             this.router.navigate(['/community', response.data.id]);
           } else {

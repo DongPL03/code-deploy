@@ -1,11 +1,11 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {FormsModule, NgForm} from '@angular/forms';
 import Swal from 'sweetalert2';
-import { ChuDe } from '../../../models/chude';
-import { BoCauHoiResponse } from '../../../responses/bocauhoi/bocauhoi-response';
-import { ResponseObject } from '../../../responses/response-object';
-import { Base } from '../../base/base';
+import {ChuDe} from '../../../models/chude';
+import {BoCauHoiResponse} from '../../../responses/bocauhoi/bocauhoi-response';
+import {ResponseObject} from '../../../responses/response-object';
+import {Base} from '../../base/base';
 
 @Component({
   selector: 'app-bo-cau-hoi-sua-bo-cau-hoi',
@@ -26,8 +26,10 @@ export class BoCauHoiEdit extends Base implements OnInit {
   loading = false;
   saving = false;
   chuDes: ChuDe[] = [];
-
   currentStatus: string = '';
+
+  // 1. Biến điều khiển Dropdown
+  showChuDeDropdown: boolean = false;
 
   ngOnInit(): void {
     this.boCauHoiId = Number(this.route.snapshot.paramMap.get('id'));
@@ -41,7 +43,7 @@ export class BoCauHoiEdit extends Base implements OnInit {
         this.chuDes = res.data || [];
       },
       error: () => {
-        Swal.fire('Lỗi', 'Không thể tải danh sách chủ đề', 'error').then((r) => {});
+        Swal.fire('Lỗi', 'Không thể tải danh sách chủ đề', 'error');
       },
     });
   }
@@ -51,7 +53,6 @@ export class BoCauHoiEdit extends Base implements OnInit {
     this.bocauHoiService.getById(this.boCauHoiId).subscribe({
       next: (res: ResponseObject<BoCauHoiResponse>) => {
         const d = res.data!;
-        console.log(d);
         this.dto = {
           tieu_de: d.tieu_de,
           mo_ta: d.mo_ta,
@@ -64,37 +65,52 @@ export class BoCauHoiEdit extends Base implements OnInit {
       error: () => {
         this.loading = false;
         Swal.fire('Lỗi', 'Không thể tải dữ liệu bộ câu hỏi', 'error').then(() => {
-          this.router.navigateByUrl('/bo-cau-hoi/danh-sach-bo-cau-hoi').then((r) => {});
+          this.router.navigateByUrl('/bo-cau-hoi/danh-sach-bo-cau-hoi');
         });
       },
     });
   }
 
+  toggleChuDeDropdown() {
+    this.showChuDeDropdown = !this.showChuDeDropdown;
+  }
+
+  selectChuDe(id: number) {
+    this.dto.chu_de_id = id;
+    this.showChuDeDropdown = false;
+  }
+
+  getSelectedChuDeName(): string {
+    if (!this.dto.chu_de_id) return '-- Chọn chủ đề --';
+    const selected = this.chuDes.find(c => c.id === this.dto.chu_de_id);
+    return selected ? selected.ten : '-- Chọn chủ đề --';
+  }
+
+  closeDropdown() {
+    this.showChuDeDropdown = false;
+  }
+
   onSubmit(form: NgForm) {
-    if (form.invalid) {
-      Swal.fire('Cảnh báo', 'Vui lòng nhập đầy đủ thông tin', 'warning').then((r) => {});
+    if (form.invalid || !this.dto.chu_de_id) { // Check thêm chu_de_id vì custom dropdown ko tự validate form
+      Swal.fire('Cảnh báo', 'Vui lòng nhập đầy đủ thông tin', 'warning');
       return;
     }
 
     this.saving = true;
     this.bocauHoiService.update(this.boCauHoiId, this.dto).subscribe({
-      next: (res) => {
+      next: () => {
         Swal.fire('Thành công', 'Cập nhật bộ câu hỏi thành công', 'success').then(() => {
-          this.router
-            .navigate(['/bo-cau-hoi/chi-tiet-bo-cau-hoi', this.boCauHoiId])
-            .then((r) => {});
+          this.router.navigate(['/bo-cau-hoi/chi-tiet-bo-cau-hoi', this.boCauHoiId]);
         });
       },
       error: (err) => {
-        Swal.fire('Lỗi', err.error?.message || 'Không thể cập nhật bộ câu hỏi', 'error').then(
-          (r) => {}
-        );
+        Swal.fire('Lỗi', err.error?.message || 'Không thể cập nhật bộ câu hỏi', 'error');
       },
       complete: () => (this.saving = false),
     });
   }
 
   cancel() {
-    this.router.navigateByUrl('/bo-cau-hoi/danh-sach-bo-cau-hoi').then((r) => {});
+    this.router.navigateByUrl('/bo-cau-hoi/danh-sach-bo-cau-hoi');
   }
 }

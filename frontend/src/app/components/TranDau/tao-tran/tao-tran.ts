@@ -27,19 +27,15 @@ export class TaoTran extends Base implements OnInit {
 
   isModalOpen = false;
 
-  // ⭐ Dùng luôn BoCauHoiResponse để sau này muốn show thêm meta cũng được
   boCauHoiOptions: BoCauHoiResponse[] = [];
 
   keywordBoCauHoi = '';
 
-  // ⭐ Mode hiện tại (CASUAL / RANKED)
   current_mode: 'THUONG' | 'XEP_HANG' = 'THUONG';
   loading_sets = false;
 
-  // === THÊM BIẾN LƯU TRỮ METADATA ===
   preview_difficulty_counts: any = {};
   preview_type_counts: any = {};
-  // === KẾT THÚC THÊM BIẾN ===
 
   preview_loading = false;
   preview_questions: {
@@ -51,15 +47,15 @@ export class TaoTran extends Base implements OnInit {
   }[] = [];
   preview_total = 0;
 
+  showBoCauHoiDropdown = false;
+  showLuatDropdown = false;
+
   ngOnInit() {
-    // ⭐ Default: CASUAL
     this.form.loai_tran_dau = 'THUONG';
     this.form.luat_tinh_diem = 'CO_BAN';
     this.current_mode = 'THUONG';
     this.loadBoCauHoiForMode('THUONG');
   }
-
-  // ====== LOAD BỘ CÂU HỎI THEO MODE ======
 
   loadBoCauHoiForMode(mode: 'THUONG' | 'XEP_HANG') {
     this.loading_sets = true;
@@ -72,12 +68,9 @@ export class TaoTran extends Base implements OnInit {
     obs.subscribe({
       next: (res: ResponseObject<BoCauHoiResponse[] | PageResponse<BoCauHoiResponse>>) => {
         this.loading_sets = false;
-
-        // Nếu backend trả List<BoCauHoiResponse>:
         if (Array.isArray(res.data)) {
           this.boCauHoiOptions = res.data as BoCauHoiResponse[];
         } else {
-          // Nếu backend vẫn trả PageResponse:
           const page = res.data as PageResponse<BoCauHoiResponse> | undefined;
           this.boCauHoiOptions = page?.items ?? [];
         }
@@ -90,18 +83,12 @@ export class TaoTran extends Base implements OnInit {
     });
   }
 
-  // Gọi khi user đổi radio CASUAL/RANKED
   onLoaiTranDauChange(mode: 'THUONG' | 'XEP_HANG') {
-    // SỬA Ở ĐÂY: So sánh với this.current_mode
     if (this.current_mode === mode && this.boCauHoiOptions.length > 0) {
       return;
     }
-
-    // Các logic bên dưới giữ nguyên
     this.form.loai_tran_dau = mode;
     this.form.bo_cau_hoi_id = 0 as any;
-
-    // Hàm này sẽ cập nhật lại this.current_mode = mode sau khi chạy
     this.loadBoCauHoiForMode(mode);
   }
 
@@ -214,5 +201,46 @@ export class TaoTran extends Base implements OnInit {
   cancel() {
     this.router.navigateByUrl('/tran-dau/pending').then(r => {
     });
+  }
+
+  toggleBoCauHoiDropdown() {
+    if (this.loading_sets) return; // Đang tải thì không cho mở
+    this.showBoCauHoiDropdown = !this.showBoCauHoiDropdown;
+    this.showLuatDropdown = false; // Đóng cái kia nếu đang mở
+  }
+
+  selectBoCauHoi(id: number) {
+    this.form.bo_cau_hoi_id = id;
+    this.showBoCauHoiDropdown = false;
+    this.onBoCauHoiChanged(id); // Gọi hàm preview cũ của bạn
+  }
+
+  getSelectedBoCauHoiName(): string {
+    if (!this.form.bo_cau_hoi_id) return '— Chọn bộ câu hỏi —';
+    const selected = this.boCauHoiOptions.find(b => b.id === this.form.bo_cau_hoi_id);
+    return selected ? selected.tieu_de : '— Chọn bộ câu hỏi —';
+  }
+
+  toggleLuatDropdown() {
+    this.showLuatDropdown = !this.showLuatDropdown;
+    this.showBoCauHoiDropdown = false;
+  }
+
+  selectLuat(luat: 'CO_BAN' | 'THUONG_TOC_DO') {
+    this.form.luat_tinh_diem = luat;
+    this.showLuatDropdown = false;
+  }
+
+  getSelectedLuatName(): string {
+    switch (this.form.luat_tinh_diem) {
+      case 'CO_BAN': return 'Điểm cơ bản';
+      case 'THUONG_TOC_DO': return 'Điểm cơ bản + Thưởng tốc độ';
+      default: return '-- Chọn luật --';
+    }
+  }
+
+  closeAllDropdowns() {
+    this.showBoCauHoiDropdown = false;
+    this.showLuatDropdown = false;
   }
 }

@@ -40,12 +40,22 @@
 
       @if (activeTab === 'reports') {
         <div class="filter-group">
-          <i class="fa-solid fa-filter"></i>
-          <select [(ngModel)]="reportStatus" (ngModelChange)="onReportStatusChange()">
-            <option value="ALL">Tất cả trạng thái</option>
-            <option value="CHO_XU_LY">Chờ xử lý</option>
-            <option value="DA_XU_LY">Đã xử lý</option>
-          </select>
+          <div class="custom-dropdown-container">
+            <div class="dropdown-trigger" (click)="toggleStatusDropdown()">
+              <i class="fa-solid fa-filter input-icon"></i>
+              <span class="selected-text">{{ getReportStatusDisplay() }}</span>
+              <i class="fa-solid fa-chevron-down arrow" [class.rotate]="showStatusDropdown"></i>
+            </div>
+
+            @if (showStatusDropdown) {
+              <div class="dropdown-options-list animate-fade-down">
+                <div class="dropdown-item" [class.active]="reportStatus === 'ALL'" (click)="selectReportStatus('ALL')">Tất cả trạng thái</div>
+                <div class="dropdown-item" [class.active]="reportStatus === 'CHO_XU_LY'" (click)="selectReportStatus('CHO_XU_LY')">Chờ xử lý</div>
+                <div class="dropdown-item" [class.active]="reportStatus === 'DA_XU_LY'" (click)="selectReportStatus('DA_XU_LY')">Đã xử lý</div>
+              </div>
+              <div class="backdrop-click" (click)="closeDropdown()"></div>
+            }
+          </div>
         </div>
       }
     </div>

@@ -29,12 +29,29 @@
         </div>
 
         <div class="filter-select-wrapper">
-          <select [(ngModel)]="selected_chu_de_id" (change)="loadPage(0)" class="glass-select">
-            <option [ngValue]="undefined">🌐 Tất cả chủ đề</option>
-            @for (c of chu_de_options; track c.id) {
-              <option [ngValue]="c.id">{{ c.ten }}</option>
+          <div class="custom-dropdown-container">
+            <div class="dropdown-trigger glass-select" (click)="toggleChuDeDropdown()">
+              <span class="selected-text">{{ getSelectedChuDeName() }}</span>
+              <i class="fas fa-chevron-down arrow-icon" [class.rotate]="showChuDeDropdown"></i>
+            </div>
+            @if (showChuDeDropdown) {
+              <div class="dropdown-options-list animate-fade-down">
+                <div class="dropdown-item"
+                     [class.active]="selected_chu_de_id === undefined"
+                     (click)="selectChuDe(undefined)">
+                  🌐 Tất cả chủ đề
+                </div>
+                @for (c of chu_de_options; track c.id) {
+                  <div class="dropdown-item"
+                       [class.active]="selected_chu_de_id === c.id"
+                       (click)="selectChuDe(c.id)">
+                    {{ c.ten }}
+                  </div>
+                }
+              </div>
+              <div class="backdrop-click" (click)="showChuDeDropdown = false"></div>
             }
-          </select>
+          </div>
         </div>
       </div>
     </header>
@@ -176,7 +193,7 @@
 
           <div class="modal-hero">
             <div class="hero-avatar-wrapper">
-              <img [src]="getProfileImage(user_summary?.avatar_url)"
+              <img [src]="getProfileImage(user_summary.avatar_url)"
                    class="hero-avatar">
               <div class="level-badge">Lv.{{ user_summary.level }}</div>
             </div>

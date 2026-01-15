@@ -42,6 +42,11 @@ export class DanhSachKhoaHoc extends Base implements OnInit {
     {value: 2, label: '⭐ 2+ sao'},
     {value: 1, label: '⭐ 1+ sao'},
   ];
+  isMobileFilterOpen: boolean = false;
+
+  showSortDropdown = false;
+  showChuDeDropdown = false;
+  showTrangThaiDropdown = false;
 
   ngOnInit() {
     this.currentUserId = this.tokenService.getUserId();
@@ -157,5 +162,80 @@ export class DanhSachKhoaHoc extends Base implements OnInit {
         });
       }
     });
+  }
+
+  toggleMobileFilter() {
+    this.isMobileFilterOpen = !this.isMobileFilterOpen;
+  }
+
+  closeAllDropdowns() {
+    this.showSortDropdown = false;
+    this.showChuDeDropdown = false;
+    this.showTrangThaiDropdown = false;
+  }
+
+  // --- XỬ LÝ DROPDOWN SẮP XẾP ---
+  toggleSortDropdown() {
+    const wasOpen = this.showSortDropdown;
+    this.closeAllDropdowns();
+    this.showSortDropdown = !wasOpen;
+  }
+
+  selectSort(value: string) {
+    this.sortOrder = value;
+    this.closeAllDropdowns();
+    this.applyFilter();
+  }
+
+  getSortLabel(): string {
+    switch (this.sortOrder) {
+      case 'NEWEST':
+        return '🕐 Mới nhất';
+      case 'OLDEST':
+        return '📅 Cũ nhất';
+      case 'RATING_DESC':
+        return '⭐ Đánh giá cao';
+      case 'RATING_ASC':
+        return '⭐ Đánh giá thấp';
+      default:
+        return 'Sắp xếp';
+    }
+  }
+
+  // --- XỬ LÝ DROPDOWN CHỦ ĐỀ ---
+  toggleChuDeDropdown() {
+    const wasOpen = this.showChuDeDropdown;
+    this.closeAllDropdowns();
+    this.showChuDeDropdown = !wasOpen;
+  }
+
+  selectChuDe(id: number) {
+    this.chuDeId = id;
+    this.closeAllDropdowns();
+    this.applyFilter();
+  }
+
+  getChuDeLabel(): string {
+    if (this.chuDeId === 0) return '📚 Tất cả chủ đề';
+    const cd = this.chuDes.find(c => c.id === this.chuDeId);
+    return cd ? cd.ten : 'Chọn chủ đề';
+  }
+
+  // --- XỬ LÝ DROPDOWN TRẠNG THÁI ---
+  toggleTrangThaiDropdown() {
+    const wasOpen = this.showTrangThaiDropdown;
+    this.closeAllDropdowns();
+    this.showTrangThaiDropdown = !wasOpen;
+  }
+
+  selectTrangThai(value: string) {
+    this.trangThai = value;
+    this.closeAllDropdowns();
+    this.applyFilter();
+  }
+
+  getTrangThaiLabel(): string {
+    const opt = this.trangThaiOptions.find(o => o.value === this.trangThai);
+    return opt ? opt.label : 'Tất cả trạng thái';
   }
 }

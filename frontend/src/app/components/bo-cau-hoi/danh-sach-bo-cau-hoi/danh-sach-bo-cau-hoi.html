@@ -15,123 +15,119 @@
     <div class="inventory-layout">
 
       <aside class="control-panel">
-        <div class="panel-header">
-          <i class="fas fa-sliders-h"></i> Bộ Lọc
-        </div>
-
-        <div class="filter-group">
-          <div class="search-hud">
-            <i class="fas fa-search"></i>
-            <input [(ngModel)]="keyword" (keyup.enter)="applyFilter()"
-                   placeholder="Tìm kiếm bộ câu hỏi..."/>
+        <div class="panel-header" (click)="toggleMobileFilter()">
+          <div class="panel-title">
+            <i class="fas fa-sliders-h"></i> Bộ Lọc
           </div>
+          <i class="fas fa-chevron-down mobile-toggle-icon"
+             [class.rotate]="isMobileFilterOpen"></i>
         </div>
 
-        <div class="filter-group">
-          <label class="group-label">Sắp xếp</label>
-          <div class="select-wrapper">
-            <select [(ngModel)]="sortOrder" class="custom-select">
-              <option value="NEWEST">🕐 Mới nhất</option>
-              <option value="OLDEST">📅 Cũ nhất</option>
-              <option value="RATING_DESC">⭐ Đánh giá cao nhất</option>
-              <option value="RATING_ASC">⭐ Đánh giá thấp nhất</option>
-            </select>
-            <i class="fas fa-chevron-down arrow"></i>
+        <div class="filter-content" [class.show-mobile]="isMobileFilterOpen">
+
+          <div class="filter-group">
+            <div class="search-hud">
+              <i class="fas fa-search"></i>
+              <input [(ngModel)]="keyword" (keyup.enter)="applyFilter()"
+                     placeholder="Tìm kiếm bộ câu hỏi..."/>
+            </div>
           </div>
-        </div>
 
-        <div class="filter-group">
-          <label class="group-label">Chế độ</label>
-          <div class="toggle-col">
-            <label class="radio-card"
-                   [class.active]="cheDoHienThi === ''">
-              <input type="radio" name="vis" value=""
-                     [(ngModel)]="cheDoHienThi" hidden>
-              <i class="fas fa-layer-group"></i> Tất cả
-            </label>
-            <label class="radio-card"
-                   [class.active]="cheDoHienThi === 'PUBLIC'">
-              <input type="radio" name="vis" value="PUBLIC"
-                     [(ngModel)]="cheDoHienThi" hidden>
-              <i class="fas fa-globe-asia"></i> Công khai
-            </label>
-            <label class="radio-card"
-                   [class.active]="cheDoHienThi === 'PRIVATE'">
-              <input type="radio" name="vis" value="PRIVATE"
-                     [(ngModel)]="cheDoHienThi" hidden>
-              <i class="fas fa-lock"></i> Riêng tư
-            </label>
-          </div>
-        </div>
+          <div class="filter-group">
+            <label class="group-label">Sắp xếp</label>
 
-        <div class="filter-group">
-          <label class="group-label">Chủ đề</label>
-          <div class="select-wrapper">
-            <select [(ngModel)]="chuDeId" class="custom-select">
-              <option [value]="0">📚 Tất cả chủ đề</option>
-              @for (cd of chuDes; track cd.id) {
-                <option [value]="cd.id">{{ cd.ten }}</option>
+            <div class="custom-dropdown-container">
+              <div class="dropdown-trigger" (click)="toggleSortDropdown()">
+                <span class="selected-text">{{ getSelectedSortName() }}</span>
+                <i class="fas fa-chevron-down arrow" [class.rotate]="showSortDropdown"></i>
+              </div>
+
+              @if (showSortDropdown) {
+                <div class="dropdown-options-list animate-fade-down">
+                  <div class="dropdown-item"
+                       [class.active]="sortOrder === 'NEWEST'"
+                       (click)="selectSortOrder('NEWEST')">
+                    🕐 Mới nhất
+                  </div>
+                  <div class="dropdown-item"
+                       [class.active]="sortOrder === 'OLDEST'"
+                       (click)="selectSortOrder('OLDEST')">
+                    📅 Cũ nhất
+                  </div>
+                  <div class="dropdown-item"
+                       [class.active]="sortOrder === 'RATING_DESC'"
+                       (click)="selectSortOrder('RATING_DESC')">
+                    ⭐ Đánh giá cao nhất
+                  </div>
+                  <div class="dropdown-item"
+                       [class.active]="sortOrder === 'RATING_ASC'"
+                       (click)="selectSortOrder('RATING_ASC')">
+                    ⭐ Đánh giá thấp nhất
+                  </div>
+                </div>
+                <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
               }
-            </select>
-            <i class="fas fa-chevron-down arrow"></i>
+            </div>
           </div>
-        </div>
 
-        <div class="filter-group">
-          <label class="group-label">Trạng thái duyệt</label>
-          <div class="select-wrapper">
-            <select [(ngModel)]="trangThai" class="custom-select">
-              @for (opt of trangThaiOptions; track opt.value) {
-                <option [value]="opt.value">{{ opt.label }}</option>
+          <div class="filter-group">
+            <label class="group-label">Chế độ</label>
+            <div class="toggle-col">
+              <label class="radio-card" [class.active]="cheDoHienThi === ''">
+                <input type="radio" name="vis" value="" [(ngModel)]="cheDoHienThi" hidden>
+                <i class="fas fa-layer-group"></i> Tất cả
+              </label>
+              <label class="radio-card" [class.active]="cheDoHienThi === 'PUBLIC'">
+                <input type="radio" name="vis" value="PUBLIC" [(ngModel)]="cheDoHienThi" hidden>
+                <i class="fas fa-globe-asia"></i> Công khai
+              </label>
+              <label class="radio-card" [class.active]="cheDoHienThi === 'PRIVATE'">
+                <input type="radio" name="vis" value="PRIVATE" [(ngModel)]="cheDoHienThi" hidden>
+                <i class="fas fa-lock"></i> Riêng tư
+              </label>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label class="group-label">Chủ đề</label>
+            <div class="custom-dropdown-container">
+              <div class="dropdown-trigger" (click)="toggleChuDeDropdown()">
+                <span class="selected-text">{{ getSelectedChuDeName() }}</span>
+                <i class="fas fa-chevron-down arrow" [class.rotate]="showChuDeDropdown"></i>
+              </div>
+
+              @if (showChuDeDropdown) {
+                <div class="dropdown-options-list animate-fade-down">
+                  <div class="dropdown-item"
+                       [class.active]="chuDeId === 0"
+                       (click)="selectChuDe(0)">
+                    📚 Tất cả chủ đề
+                  </div>
+
+                  @for (cd of chuDes; track cd.id) {
+                    <div class="dropdown-item"
+                         [class.active]="chuDeId === cd.id"
+                         (click)="selectChuDe(cd.id)">
+                      {{ cd.ten }}
+                    </div>
+                  }
+                </div>
               }
-            </select>
-            <i class="fas fa-chevron-down arrow"></i>
-          </div>
-        </div>
 
-        <div class="filter-group">
-          <label class="group-label">Giá mở khóa</label>
-          <div class="toggle-col">
-            <label class="radio-card"
-                   [class.active]="priceFilter === 'ALL'">
-              <input type="radio" name="price" value="ALL"
-                     [(ngModel)]="priceFilter" hidden>
-              <i class="fas fa-coins"></i> Tất cả
-            </label>
-            <label class="radio-card"
-                   [class.active]="priceFilter === 'FREE'">
-              <input type="radio" name="price" value="FREE"
-                     [(ngModel)]="priceFilter" hidden>
-              <i class="fas fa-gift"></i> Miễn phí
-            </label>
-            <label class="radio-card"
-                   [class.active]="priceFilter === 'PAID'">
-              <input type="radio" name="price" value="PAID"
-                     [(ngModel)]="priceFilter" hidden>
-              <i class="fas fa-key"></i> Mất phí
-            </label>
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <label class="group-label">Đánh giá</label>
-          <div class="select-wrapper">
-            <select [(ngModel)]="minRating" class="custom-select">
-              @for (opt of ratingOptions; track opt.value) {
-                <option [ngValue]="opt.value">{{ opt.label }}</option>
+              @if (showChuDeDropdown) {
+                <div class="backdrop-click" (click)="showChuDeDropdown = false"></div>
               }
-            </select>
-            <i class="fas fa-chevron-down arrow"></i>
+            </div>
           </div>
-        </div>
 
-        <div class="panel-actions">
-          <button class="btn-glass primary" (click)="applyFilter()">
-            <i class="fas fa-filter"></i> Áp dụng
-          </button>
-          <button class="btn-glass secondary" (click)="clearFilter()">
-            <i class="fas fa-redo"></i> Xóa lọc
-          </button>
+          <div class="panel-actions">
+            <button class="btn-glass primary" (click)="applyFilter()">
+              <i class="fas fa-filter"></i> Áp dụng
+            </button>
+            <button class="btn-glass secondary" (click)="clearFilter()">
+              <i class="fas fa-redo"></i> Xóa lọc
+            </button>
+          </div>
         </div>
       </aside>
 

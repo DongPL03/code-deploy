@@ -34,6 +34,8 @@ export class AdminCauHoiEdit extends Base implements OnInit {
 
   readonly luaChonList: ('A' | 'B' | 'C' | 'D')[] = ['A', 'B', 'C', 'D'];
 
+  showDifficultyDropdown = false;
+
   ngOnInit(): void {
     this.cau_hoi_id = Number(this.route.snapshot.paramMap.get('id'));
     this.loadQuestion();
@@ -122,5 +124,31 @@ export class AdminCauHoiEdit extends Base implements OnInit {
 
   backToBoCauHoiDetail(): void {
     this.router.navigate(['/admin/bo-cau-hoi', this.bo_cau_hoi_id]).then();
+  }
+
+  toggleDifficultyDropdown() {
+    this.showDifficultyDropdown = !this.showDifficultyDropdown;
+  }
+
+  selectDifficulty(val: 'DE' | 'TRUNG_BINH' | 'KHO') {
+    this.model.do_kho = val;
+    this.showDifficultyDropdown = false;
+  }
+
+  getDifficultyLabel(): string {
+    switch (this.model.do_kho) {
+      case 'DE':
+        return '🟢 Dễ';
+      case 'TRUNG_BINH':
+        return '🟡 Trung bình';
+      case 'KHO':
+        return '🔴 Khó';
+      default:
+        return 'Chọn độ khó';
+    }
+  }
+
+  closeDropdown() {
+    this.showDifficultyDropdown = false;
   }
 }

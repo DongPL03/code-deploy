@@ -44,14 +44,30 @@
 
             <div class="form-group">
               <label>Chủ đề kiến thức <span class="required">*</span></label>
-              <div class="select-wrapper">
-                <i class="fas fa-layer-group input-icon"></i>
-                <select name="chu_de_id" required [(ngModel)]="dto.chu_de_id">
-                  @for (c of chuDes; track c.id) {
-                    <option [value]="c.id">{{ c.ten }}</option>
-                  }
-                </select>
-                <i class="fas fa-chevron-down arrow-icon"></i>
+
+              <div class="custom-dropdown-container">
+                <div class="dropdown-trigger" (click)="toggleChuDeDropdown()">
+                  <div class="trigger-content">
+                    <i class="fas fa-layer-group input-icon-static"></i>
+                    <span class="selected-text" [class.placeholder]="!dto.chu_de_id">
+                      {{ getSelectedChuDeName() }}
+                    </span>
+                  </div>
+                  <i class="fas fa-chevron-down arrow-icon" [class.rotate]="showChuDeDropdown"></i>
+                </div>
+
+                @if (showChuDeDropdown) {
+                  <div class="dropdown-options-list animate-fade-down">
+                    @for (c of chuDes; track c.id) {
+                      <div class="dropdown-item"
+                           [class.active]="dto.chu_de_id === c.id"
+                           (click)="selectChuDe(c.id)">
+                        {{ c.ten }}
+                      </div>
+                    }
+                  </div>
+                  <div class="backdrop-click" (click)="closeDropdown()"></div>
+                }
               </div>
             </div>
 
@@ -75,9 +91,8 @@
               <label>Chế độ hiển thị</label>
 
               <div class="visibility-options">
-
                 <label class="visual-card public-card" [class.selected]="dto.che_do_hien_thi === 'CONG_KHAI'">
-                  <input type="radio" name="che_do_hien_thi" value="PUBLIC" [(ngModel)]="dto.che_do_hien_thi" hidden>
+                  <input type="radio" name="che_do_hien_thi" value="CONG_KHAI" [(ngModel)]="dto.che_do_hien_thi" hidden>
                   <div class="card-icon"><i class="fas fa-globe-americas"></i></div>
                   <div class="card-info">
                     <span class="card-name">Công Khai</span>
@@ -87,7 +102,7 @@
                 </label>
 
                 <label class="visual-card private-card" [class.selected]="dto.che_do_hien_thi === 'RIENG_TU'">
-                  <input type="radio" name="che_do_hien_thi" value="PRIVATE" [(ngModel)]="dto.che_do_hien_thi" hidden>
+                  <input type="radio" name="che_do_hien_thi" value="RIENG_TU" [(ngModel)]="dto.che_do_hien_thi" hidden>
                   <div class="card-icon"><i class="fas fa-lock"></i></div>
                   <div class="card-info">
                     <span class="card-name">Riêng Tư</span>
@@ -95,18 +110,16 @@
                   </div>
                   <div class="check-circle"><i class="fas fa-check"></i></div>
                 </label>
-
               </div>
             </div>
 
-            @if (dto.che_do_hien_thi === 'PUBLIC') {
+            @if (dto.che_do_hien_thi === 'CONG_KHAI') {
               <div class="warning-box">
                 <div class="warn-icon"><i class="fas fa-exclamation-triangle"></i></div>
                 <p><strong>Lưu ý:</strong> Chỉnh sửa nội dung có thể khiến bộ câu hỏi chuyển về trạng thái <strong>Chờ
                   duyệt</strong>.</p>
               </div>
             }
-
           </section>
         </div>
 
@@ -127,7 +140,6 @@
 
       </form>
     </div>
-
   </div>
 } @else {
   <div class="loading-screen">

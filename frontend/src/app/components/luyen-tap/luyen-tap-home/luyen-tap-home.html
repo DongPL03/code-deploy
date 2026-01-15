@@ -18,14 +18,27 @@
           <form #f="ngForm" (ngSubmit)="onStart(f)" class="control-form">
             <div class="input-group">
               <label><i class="fas fa-book"></i> Chọn bộ đề:</label>
-              <div class="select-wrapper">
-                <select name="bo_cau_hoi_id" [(ngModel)]="bo_cau_hoi_id">
-                  <option [ngValue]="null">-- Chọn bộ câu hỏi --</option>
-                  @for (bo of bo_cau_hoi_options(); track bo.id) {
-                    <option [ngValue]="bo.id">{{ bo.tieu_de }}</option>
-                  }
-                </select>
-                <i class="fas fa-chevron-down arrow"></i>
+
+              <div class="custom-dropdown-container">
+                <div class="dropdown-trigger" (click)="toggleBoDeDropdown()"><span class="selected-text"
+                                                                                   [class.placeholder]="!bo_cau_hoi_id">
+                  {{ getSelectedBoDeName() }}</span>
+                  <i class="fas fa-chevron-down arrow" [class.rotate]="showBoDeDropdown"></i>
+                </div>
+
+                @if (showBoDeDropdown) {
+                  <div class="dropdown-options-list animate-fade-down">
+                    <div class="dropdown-item" [class.active]="bo_cau_hoi_id === null" (click)="selectBoDe(null)">
+                      -- Chọn bộ câu hỏi --
+                    </div>
+                    @for (bo of bo_cau_hoi_options(); track bo.id) {
+                      <div class="dropdown-item" [class.active]="bo_cau_hoi_id === bo.id" (click)="selectBoDe(bo.id)">
+                        {{ bo.tieu_de }}
+                      </div>
+                    }
+                  </div>
+                  <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
+                }
               </div>
             </div>
 
@@ -53,12 +66,28 @@
           <div class="section-header">
             <h3><i class="fas fa-history"></i> Lịch sử đấu tập</h3>
             <div class="filters">
-              <select [(ngModel)]="filterBoCauHoiId" (change)="loadHistory(0)" class="mini-select">
-                <option [ngValue]="null">Tất cả bộ đề</option>
-                @for (bo of bo_cau_hoi_options(); track bo.id) {
-                  <option [ngValue]="bo.id">{{ bo.tieu_de }}</option>
+
+              <div class="custom-dropdown-container mini-container">
+                <div class="dropdown-trigger mini-trigger" (click)="toggleHistoryFilterDropdown()">
+                  <span class="selected-text">{{ getSelectedHistoryFilterName() }}</span>
+                  <i class="fas fa-chevron-down arrow" [class.rotate]="showHistoryFilterDropdown"></i>
+                </div>
+
+                @if (showHistoryFilterDropdown) {
+                  <div class="dropdown-options-list animate-fade-down right-aligned">
+                    <div class="dropdown-item" [class.active]="filterBoCauHoiId === null" (click)="selectHistoryFilter(null)">
+                      Tất cả bộ đề
+                    </div>
+                    @for (bo of bo_cau_hoi_options(); track bo.id) {
+                      <div class="dropdown-item" [class.active]="filterBoCauHoiId === bo.id" (click)="selectHistoryFilter(bo.id)">
+                        {{ bo.tieu_de }}
+                      </div>
+                    }
+                  </div>
+                  <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
                 }
-              </select>
+              </div>
+
             </div>
           </div>
 

@@ -1,21 +1,56 @@
 <div class="address-grid">
-  <div>
+
+  <div class="form-group">
     <label>Tỉnh / Thành phố</label>
-    <select [(ngModel)]="selectedProvince" (change)="onProvinceChange()">
-      <option value="">-- Chọn Tỉnh/TP --</option>
-      @for (p of provinces; track p.code) {
-        <option [value]="p.code">{{ p.name }}</option>
+    <div class="custom-dropdown-container">
+      <div class="dropdown-trigger" (click)="toggleProvinceDropdown()">
+        <span class="selected-text" [class.placeholder]="!selectedProvince">
+          {{ getSelectedProvinceName() }}
+        </span>
+        <i class="fas fa-chevron-down arrow" [class.rotate]="showProvinceDropdown"></i>
+      </div>
+
+      @if (showProvinceDropdown) {
+        <div class="dropdown-options-list animate-fade-down">
+          @for (p of provinces; track p.code) {
+            <div class="dropdown-item"
+                 [class.active]="selectedProvince == p.code"
+                 (click)="selectProvince(p.code)">
+              {{ p.name }}
+            </div>
+          }
+        </div>
+        <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
       }
-    </select>
+    </div>
   </div>
 
-  <div>
+  <div class="form-group">
     <label>Phường / Xã</label>
-    <select [(ngModel)]="selectedWard" (change)="emitAddress()">
-      <option value="">-- Chọn Phường/Xã --</option>
-      @for (w of filteredWards; track w.code) {
-        <option [value]="w.code">{{ w.name }}</option>
+    <div class="custom-dropdown-container" [class.disabled]="!selectedProvince">
+      <div class="dropdown-trigger" (click)="toggleWardDropdown()">
+        <span class="selected-text" [class.placeholder]="!selectedWard">
+          {{ getSelectedWardName() }}
+        </span>
+        <i class="fas fa-chevron-down arrow" [class.rotate]="showWardDropdown"></i>
+      </div>
+
+      @if (showWardDropdown) {
+        <div class="dropdown-options-list animate-fade-down">
+          @if (filteredWards.length === 0) {
+            <div class="dropdown-item empty">Không có dữ liệu</div>
+          }
+          @for (w of filteredWards; track w.code) {
+            <div class="dropdown-item"
+                 [class.active]="selectedWard == w.code"
+                 (click)="selectWard(w.code)">
+              {{ w.name }}
+            </div>
+          }
+        </div>
+        <div class="backdrop-click" (click)="closeAllDropdowns()"></div>
       }
-    </select>
+    </div>
   </div>
+
 </div>

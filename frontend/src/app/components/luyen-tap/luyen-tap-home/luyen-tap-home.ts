@@ -84,6 +84,9 @@ export class LuyenTapHomeComponent extends Base implements OnInit, OnDestroy {
 
   protected readonly environment = environment;
 
+  showBoDeDropdown = false;
+  showHistoryFilterDropdown = false;
+
   ngOnInit(): void {
     this.loadPracticeSets();
     this.loadKhoaHocOptions();
@@ -242,10 +245,8 @@ export class LuyenTapHomeComponent extends Base implements OnInit, OnDestroy {
     });
   }
 
-  /** Load danh sách khóa học để filter lịch sử */
   private loadKhoaHocOptions() {
-    // Lấy tối đa 50 khóa học published để filter
-    this.khoaHocService.getAll('', 0, 'PUBLISHED', 'NEWEST', 0, 50).subscribe({
+    this.khoaHocService.getAll('', 0, 'CONG_KHAI', 'NEWEST', 0, 50).subscribe({
       next: (res: ResponseObject<PageResponse<KhoaHoiResponse>>) => {
         const page = res.data!;
         this.khoa_hoc_options.set(page?.items ?? []);
@@ -728,8 +729,48 @@ export class LuyenTapHomeComponent extends Base implements OnInit, OnDestroy {
   }
 
   getAccuracyClass(acc: number): string {
-    if (acc >= 80) return 'high'; // Xanh
-    if (acc >= 50) return 'med';  // Vàng
-    return 'low';                 // Đỏ
+    if (acc >= 80) return 'high';
+    if (acc >= 50) return 'med';
+    return 'low';
+  }
+
+  toggleBoDeDropdown() {
+    this.showBoDeDropdown = !this.showBoDeDropdown;
+    this.showHistoryFilterDropdown = false;
+  }
+
+  selectBoDe(id: number | null) {
+    this.bo_cau_hoi_id = id;
+    this.showBoDeDropdown = false;
+  }
+
+  getSelectedBoDeName(): string {
+    if (!this.bo_cau_hoi_id) return '-- Chọn bộ câu hỏi --';
+    const list = this.bo_cau_hoi_options();
+    const selected = list.find(b => b.id === this.bo_cau_hoi_id);
+    return selected ? selected.tieu_de : '-- Chọn bộ câu hỏi --';
+  }
+
+  toggleHistoryFilterDropdown() {
+    this.showHistoryFilterDropdown = !this.showHistoryFilterDropdown;
+    this.showBoDeDropdown = false;
+  }
+
+  selectHistoryFilter(id: number | null) {
+    this.filterBoCauHoiId = id;
+    this.showHistoryFilterDropdown = false;
+    this.loadHistory(0); // Reload lại lịch sử
+  }
+
+  getSelectedHistoryFilterName(): string {
+    if (!this.filterBoCauHoiId) return 'Tất cả bộ đề';
+    const list = this.bo_cau_hoi_options();
+    const selected = list.find(b => b.id === this.filterBoCauHoiId);
+    return selected ? selected.tieu_de : 'Tất cả bộ đề';
+  }
+
+  closeAllDropdowns() {
+    this.showBoDeDropdown = false;
+    this.showHistoryFilterDropdown = false;
   }
 }
