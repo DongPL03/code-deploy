@@ -21,17 +21,15 @@
         <span class="badge badge-mode"
           [class.private]="bo?.che_do_hien_thi === 'PRIVATE'">
           <i class="fas"
-            [ngClass]="bo?.che_do_hien_thi === 'PUBLIC' ? 'fa-globe' : 'fa-lock'"></i>
+            [ngClass]="bo?.che_do_hien_thi === 'CONG_KHAI' ? 'fa-globe' : 'fa-lock'"></i>
           {{ bo?.che_do_hien_thi }}
         </span>
       </div>
 
       <h1 class="quiz-title">{{ bo?.tieu_de || 'Đang tải tiêu đề...'
         }}</h1>
-      <p class="quiz-desc">{{ bo?.mo_ta || 'Chưa có mô tả cho bộ câu
-        hỏi này.' }}</p>
-
-      @if (bo?.che_do_hien_thi === 'PUBLIC' && bo?.trang_thai ===
+      <p class="quiz-desc">{{ bo?.mo_ta || 'Chưa có mô tả cho bộ câu hỏi này.' }}</p>
+      @if (bo?.che_do_hien_thi === 'CONG_KHAI' && bo?.trang_thai ===
       'CHO_DUYET') {
       <div class="alert-box info">
         <i class="fas fa-info-circle"></i>

@@ -77,12 +77,12 @@
                 <input type="radio" name="vis" value="" [(ngModel)]="cheDoHienThi" hidden>
                 <i class="fas fa-layer-group"></i> Tất cả
               </label>
-              <label class="radio-card" [class.active]="cheDoHienThi === 'PUBLIC'">
-                <input type="radio" name="vis" value="PUBLIC" [(ngModel)]="cheDoHienThi" hidden>
+              <label class="radio-card" [class.active]="cheDoHienThi === 'CONG_KHAI'">
+                <input type="radio" name="vis" value="CONG_KHAI" [(ngModel)]="cheDoHienThi" hidden>
                 <i class="fas fa-globe-asia"></i> Công khai
               </label>
-              <label class="radio-card" [class.active]="cheDoHienThi === 'PRIVATE'">
-                <input type="radio" name="vis" value="PRIVATE" [(ngModel)]="cheDoHienThi" hidden>
+              <label class="radio-card" [class.active]="cheDoHienThi === 'RIENG_TU'">
+                <input type="radio" name="vis" value="RIENG_TU" [(ngModel)]="cheDoHienThi" hidden>
                 <i class="fas fa-lock"></i> Riêng tư
               </label>
             </div>
@@ -222,8 +222,8 @@
               }
             </span>
               <span class="badge-pill visibility-badge"
-                    [class.is-private]="quiz.che_do_hien_thi === 'PRIVATE'">
-              @if (quiz.che_do_hien_thi === 'PUBLIC') {
+                    [class.is-private]="quiz.che_do_hien_thi === 'RIENG_TU'">
+              @if (quiz.che_do_hien_thi === 'CONG_KHAI') {
                 <i class="fas fa-globe"></i> Public
               } @else {
                 <i class="fas fa-lock"></i> Private

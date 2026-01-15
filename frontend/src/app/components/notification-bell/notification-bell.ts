@@ -286,15 +286,15 @@ export class NotificationBell extends Base implements OnInit {
   getDisplayType(n: NotificationResponse): string {
     const t = this.getTypeFromMetadata(n);
     switch (t) {
-      case 'FRIEND_REQUEST':
+      case 'LOI_MOI_KET_BAN':
         return 'Lời mời kết bạn';
-      case 'BATTLE_INVITE':
+      case 'LOI_MOI_TRAN_DAU':
         return 'Lời mời trận đấu';
-      case 'QUIZ_APPROVED':
+      case 'BO_CAU_HOI_DUYET':
         return 'Bộ câu hỏi được duyệt';
-      case 'QUIZ_UNLOCKED':
+      case 'BO_CAU_HOI_DUYET_MO_KHOA':
         return 'Bộ câu hỏi được mở khóa';
-      case 'SYSTEM':
+      case 'HE_THONG':
       default:
         return 'Hệ thống';
     }
@@ -308,15 +308,17 @@ export class NotificationBell extends Base implements OnInit {
   getIconClass(notif: any): string {
     const type = this.getTypeFromMetadata(notif);
     switch (type) {
-      case 'FRIEND_REQUEST':
-        return 'friend';
-      case 'BATTLE_INVITE':
-        return 'battle';
-      case 'QUIZ_APPROVED':
+      case 'LOI_MOI_KET_BAN':
+        return 'Lời mời kết bạn';
+      case 'LOI_MOI_TRAN_DAU':
+        return 'Lời mời trận đấu';
+      case 'BO_CAU_HOI_DUYET':
+        return 'Bộ câu hỏi được duyệt';
       case 'QUIZ_UNLOCKED':
         return 'gold'; // Hoặc tạo class 'quiz' riêng
+      case 'HE_THONG':
       default:
-        return 'system';
+        return 'Hệ thống';
     }
   }
 
@@ -324,11 +326,11 @@ export class NotificationBell extends Base implements OnInit {
   getIcon(notif: any): string {
     const type = this.getTypeFromMetadata(notif);
     switch (type) {
-      case 'FRIEND_REQUEST':
+      case 'LOI_MOI_KET_BAN':
         return 'fas fa-user-plus';
-      case 'BATTLE_INVITE':
+      case 'LOI_MOI_TRAN_DAU':
         return 'fas fa-swords'; // Cần FontAwesome Pro hoặc dùng fa-gamepad
-      case 'QUIZ_APPROVED':
+      case 'BO_CAU_HOI_DUYET':
         return 'fas fa-check-circle';
       case 'QUIZ_UNLOCKED':
         return 'fas fa-unlock-alt';

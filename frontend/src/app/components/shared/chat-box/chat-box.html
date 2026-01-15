@@ -4,14 +4,14 @@
         <div class="user-info">
             <div class="avatar-wrapper">
                 <img [src]="getAvatarUrl()" [alt]="friend.ho_ten" />
-                @if (friend.trang_thai === 'ONLINE') {
+                @if (friend.trang_thai === 'TRUC_TUYEN') {
                 <span class="status-dot online"></span>
                 }
             </div>
             <div class="user-details">
                 <span class="user-name">{{ friend.ho_ten }}</span>
                 <span class="user-status">
-                    {{ friend.trang_thai === 'ONLINE' ? 'Đang hoạt động' : 'Không hoạt động' }}
+                    {{ friend.trang_thai === 'TRUC_TUYEN' ? 'Đang hoạt động' : 'Không hoạt động' }}
                 </span>
             </div>
         </div>
