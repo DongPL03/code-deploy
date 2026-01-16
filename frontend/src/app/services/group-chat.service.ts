@@ -88,7 +88,7 @@ export class GroupChatService implements OnDestroy {
       },
       debug: (str) => {
         if (!environment.production) {
-          console.log('[STOMP]', str);
+          // console.log('[STOMP]', str);
         }
       },
       reconnectDelay: 5000,
@@ -97,7 +97,7 @@ export class GroupChatService implements OnDestroy {
     });
 
     this.stompClient.onConnect = () => {
-      console.log('Group Chat WebSocket connected');
+      // console.log('Group Chat WebSocket connected');
       this.connectionStatusSubject.next(true);
       this.reconnectAttempts = 0;
 
@@ -106,7 +106,7 @@ export class GroupChatService implements OnDestroy {
     };
 
     this.stompClient.onDisconnect = () => {
-      console.log('Group Chat WebSocket disconnected');
+      // console.log('Group Chat WebSocket disconnected');
       this.connectionStatusSubject.next(false);
     };
 

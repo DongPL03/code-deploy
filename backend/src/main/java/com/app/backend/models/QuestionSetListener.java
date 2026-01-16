@@ -46,7 +46,7 @@ public class QuestionSetListener {
 
     @PostRemove
     public void postRemove(BoCauHoi boCauHoi) {
-        logger.info("🔄 BoCauHoi DELETED: {} - clearing Redis cache", boCauHoi.getId());
+//        logger.info("🔄 BoCauHoi DELETED: {} - clearing Redis cache", boCauHoi.getId());
         clearCache();
     }
     
@@ -59,7 +59,7 @@ public class QuestionSetListener {
                 redisService.invalidateQuestionListCache();
             }
         } catch (Exception e) {
-            logger.warn("⚠️ Không thể invalidate Redis cache: {}", e.getMessage());
+//            logger.warn("⚠️ Không thể invalidate Redis cache: {}", e.getMessage());
         }
     }
 }

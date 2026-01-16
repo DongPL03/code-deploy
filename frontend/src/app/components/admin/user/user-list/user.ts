@@ -97,7 +97,7 @@ export class AdminUserList extends Base implements OnInit {
     this.userService.getAdminUserList(this.buildParams()).subscribe({
       next: (res: ResponseObject<UserListResponse>) => {
         const data = res.data;
-        console.log(data);
+        // console.log(data);
         this.allUsers = data?.users ?? [];
         this.totalPages = data?.total_pages ?? 0;
         this.applyStatusFilter();

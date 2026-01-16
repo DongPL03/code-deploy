@@ -52,7 +52,7 @@ export class BoCauHoiDetail extends Base implements OnInit {
         // 1. Xử lý thông tin bộ câu hỏi trước
         const resBo = result.boCauHoi as ResponseObject<BoCauHoiResponse>;
         this.bo = resBo.data;
-        console.log('Bộ câu hỏi đã load:', this.bo);
+        // console.log('Bộ câu hỏi đã load:', this.bo);
 
         // 2. Xử lý danh sách câu hỏi sau khi đã có this.bo
         const resCau = result.danhSachCau as ResponseObject<PageResponse<CauHoiResponse>>;

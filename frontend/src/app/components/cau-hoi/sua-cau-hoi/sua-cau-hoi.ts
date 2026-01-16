@@ -1,19 +1,19 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule, NgForm} from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
 import Swal from 'sweetalert2';
-import {Base} from '../../base/base';
-import {ResponseObject} from '../../../responses/response-object';
-import {CauHoiResponse} from '../../../responses/cauhoi/cauhoi-response';
-import {CauHoiDTO} from '../../../dtos/cau-hoi/cauhoi-dto';
-import {environment} from '../../../environments/environment';
+import { CauHoiDTO } from '../../../dtos/cau-hoi/cauhoi-dto';
+import { environment } from '../../../environments/environment';
+import { CauHoiResponse } from '../../../responses/cauhoi/cauhoi-response';
+import { ResponseObject } from '../../../responses/response-object';
+import { Base } from '../../base/base';
 
 @Component({
   selector: 'app-sua-bo-cau-hoi-question',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './sua-cau-hoi.html',
-  styleUrl: './sua-cau-hoi.scss'
+  styleUrl: './sua-cau-hoi.scss',
 })
 export class CauHoiEdit extends Base implements OnInit {
   @ViewChild('form') form!: NgForm;
@@ -44,7 +44,7 @@ export class CauHoiEdit extends Base implements OnInit {
       next: (res: ResponseObject<CauHoiResponse>) => {
         this.question = res.data!;
         // Copy dữ liệu sang model
-        this.model = {...this.model, ...res.data};
+        this.model = { ...this.model, ...res.data };
 
         // Xử lý preview URL nếu có
         if (res.data?.duong_dan_tep) {
@@ -59,8 +59,9 @@ export class CauHoiEdit extends Base implements OnInit {
         this.loading = false;
       },
       error: () => {
-        Swal.fire('Lỗi', 'Không thể tải dữ liệu câu hỏi', 'error')
-          .then(() => this.backToBoCauHoiDetail());
+        Swal.fire('Lỗi', 'Không thể tải dữ liệu câu hỏi', 'error').then(() =>
+          this.backToBoCauHoiDetail()
+        );
         this.loading = false;
       },
     });
@@ -103,8 +104,17 @@ export class CauHoiEdit extends Base implements OnInit {
 
     this.saving = true;
 
+    // Tạo bản copy của model để gửi lên server
+    const updateData = { ...this.model };
+
+    // Nếu người dùng chọn file mới, KHÔNG gửi duong_dan_tep trong update request
+    // File sẽ được upload riêng sau đó
+    if (this.selectedFile) {
+      delete updateData.duong_dan_tep;
+    }
+
     // Bước 1: Cập nhật thông tin text trước
-    this.cauHoiService.update(this.questionId, this.model).subscribe({
+    this.cauHoiService.update(this.questionId, updateData).subscribe({
       next: () => {
         // Bước 2: Nếu có file mới được chọn, tiến hành upload
         if (this.selectedFile && this.model.loai_noi_dung !== 'VAN_BAN') {
@@ -116,7 +126,7 @@ export class CauHoiEdit extends Base implements OnInit {
       error: (err) => {
         this.saving = false;
         Swal.fire('Lỗi', err.error?.message || 'Cập nhật thất bại', 'error');
-      }
+      },
     });
   }
 
@@ -133,9 +143,10 @@ export class CauHoiEdit extends Base implements OnInit {
       },
       error: () => {
         this.saving = false;
-        Swal.fire('Cảnh báo', 'Cập nhật thông tin thành công nhưng lỗi tải file', 'warning')
-          .then(() => this.backToBoCauHoiDetail());
-      }
+        Swal.fire('Cảnh báo', 'Cập nhật thông tin thành công nhưng lỗi tải file', 'warning').then(
+          () => this.backToBoCauHoiDetail()
+        );
+      },
     });
   }
 
@@ -146,7 +157,7 @@ export class CauHoiEdit extends Base implements OnInit {
       title: 'Thành công',
       text: 'Đã cập nhật câu hỏi!',
       timer: 1500,
-      showConfirmButton: false
+      showConfirmButton: false,
     }).then(() => this.backToBoCauHoiDetail());
   }
 

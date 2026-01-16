@@ -272,7 +272,7 @@ export class AdminBoCauHoiList extends Base implements OnInit {
   }
 
   goToCreateAdminBo(): void {
-    console.log('Navigate to create new Bo Cau Hoi');
+    // console.log('Navigate to create new Bo Cau Hoi');
     // this.router.navigate('/admin/bo-cau-hoi/tao-moi').then(r => {
     // });
     this.router.navigate(['/admin/bo-cau-hoi/tao-moi']).then((r) => {

@@ -82,7 +82,7 @@ public class BattleLoopTask {
                 tranDauService.processQuestionTimeout(tranDauId);
                 try {
                     int timeBreak = 5000;
-                    System.out.println("--- Nghỉ " + timeBreak + "ms xem BXH ---");
+//                    System.out.println("--- Nghỉ " + timeBreak + "ms xem BXH ---");
                     Thread.sleep(timeBreak);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
@@ -92,7 +92,7 @@ public class BattleLoopTask {
             tranDauService.finishBattle(tranDauId, null, true);
 
         } catch (Exception e) {
-            System.err.println("❌ Lỗi trong BattleLoopTask: " + e.getMessage());
+//            System.err.println("❌ Lỗi trong BattleLoopTask: " + e.getMessage());
             e.printStackTrace();
         } finally {
             state.setAutoLoopRunning(false);

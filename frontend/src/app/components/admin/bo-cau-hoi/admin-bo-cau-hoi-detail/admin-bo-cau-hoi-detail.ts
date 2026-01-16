@@ -41,7 +41,7 @@ export class AdminBoCauHoiDetail extends Base implements OnInit {
   loadBoCauHoi(): void {
     this.bocauHoiService.getById(this.id).subscribe({
       next: (res: ResponseObject<BoCauHoiResponse>) => {
-        console.log(res.data);
+        // console.log(res.data);
         this.bo_cau_hoi = res.data!;
       },
       error: () => {
@@ -137,7 +137,7 @@ export class AdminBoCauHoiDetail extends Base implements OnInit {
           this.loadBoCauHoi();
         },
         error: (err) => {
-          console.log('🔥 Check lỗi:', err); // Log để kiểm tra
+          // console.log('🔥 Check lỗi:', err); // Log để kiểm tra
 
           // 1. Mặc định
           let hienThiLoi = 'Không thể duyệt bộ câu hỏi';

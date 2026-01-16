@@ -43,7 +43,7 @@ export class AudioService {
       if (this._userInteracted) return;
 
       this._userInteracted = true;
-      console.log('🎵 User đã tương tác - Audio đã được unlock!');
+      // console.log('🎵 User đã tương tác - Audio đã được unlock!');
 
       // Phát track đang chờ nếu có
       if (this.pendingTrack && !this._isMuted) {
@@ -99,7 +99,7 @@ export class AudioService {
 
     // Nếu user chưa tương tác, lưu lại track để phát sau
     if (!this._userInteracted) {
-      console.log('🎵 Chờ user tương tác để phát nhạc:', track);
+      // console.log('🎵 Chờ user tương tác để phát nhạc:', track);
       this.pendingTrack = track;
       return;
     }

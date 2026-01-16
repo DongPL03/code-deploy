@@ -117,7 +117,7 @@ export class NotificationBell extends Base implements OnInit {
     this.notificationService.getUnreadCount().subscribe({
       next: (res: ResponseObject<any>) => {
         this.unread_count = res.data ?? 0;
-        console.log('Loaded unread notification count:', this.unread_count);
+        // console.log('Loaded unread notification count:', this.unread_count);
       },
       error: () => {
         this.unread_count = 0;
@@ -127,12 +127,12 @@ export class NotificationBell extends Base implements OnInit {
 
   toggleDropdown(event: Event): void {
     event.stopPropagation(); // 🛑 Dừng không cho lan lên document
-    console.log('Toggling notification dropdown');
+    // console.log('Toggling notification dropdown');
     this.show_dropdown = !this.show_dropdown;
-    console.log('Dropdown is now', this.show_dropdown ? 'shown' : 'hidden');
+    // console.log('Dropdown is now', this.show_dropdown ? 'shown' : 'hidden');
     if (this.show_dropdown && this.notifications.length === 0) {
       this.loadPage(0);
-      console.log('Loading first page of notifications');
+      // console.log('Loading first page of notifications');
     }
   }
 
@@ -246,7 +246,7 @@ export class NotificationBell extends Base implements OnInit {
   acceptBattleInvite(): void {
     const notif = this.battle_invite_toast;
     const tranDauId = this.battle_invite_tran_dau_id;
-    console.log('Accept battle invite to match id:', tranDauId);
+    // console.log('Accept battle invite to match id:', tranDauId);
     if (!notif || !tranDauId) {
       return;
     }

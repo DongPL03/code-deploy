@@ -95,7 +95,7 @@ export class Home extends Base implements OnInit, OnDestroy {
 
     this.userService.getUserSummary(user_id).subscribe({
       next: (res: ResponseObject<UserSummaryResponse>) => {
-        console.log('✅ Thống kê người dùng tải về:', res.data);
+        // console.log('✅ Thống kê người dùng tải về:', res.data);
         this.loading_summary = false;
         this.user_summary = res.data ?? null;
         if (this.user_summary) {
@@ -103,7 +103,7 @@ export class Home extends Base implements OnInit, OnDestroy {
           const { so_tran_thang, tong_tran } = this.user_summary;
           this.user_summary.ti_le_thang = tong_tran > 0 ? so_tran_thang / tong_tran : 0;
         }
-        console.log('User Summary:', this.user_summary);
+        // console.log('User Summary:', this.user_summary);
 
         // Lấy tối đa 3 trận gần nhất từ lich_su_tran_dau (nếu backend có trả)
         const history = this.user_summary?.lich_su_tran_dau ?? [];

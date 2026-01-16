@@ -109,7 +109,7 @@ export class TaoTran extends Base implements OnInit {
   }
 
   fetchPreview(bo_cau_hoi_id: number) {
-    console.log('Fetching preview for BoCauHoi ID:', bo_cau_hoi_id);
+    // console.log('Fetching preview for BoCauHoi ID:', bo_cau_hoi_id);
     this.preview_loading = true;
     this.preview_questions = [];
     this.preview_difficulty_counts = {};

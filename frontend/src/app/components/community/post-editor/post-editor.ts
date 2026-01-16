@@ -188,7 +188,7 @@ export class PostEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addTag(tag: Tag): void {
     if (this.selectedTags.length >= 5) {
-      console.log('Tối đa 5 tags cho mỗi bài viết');
+      // console.log('Tối đa 5 tags cho mỗi bài viết');
       return;
     }
     this.selectedTags.push(tag);
@@ -211,7 +211,7 @@ export class PostEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     const maxFiles = 10 - this.uploadedImages.length;
 
     if (files.length > maxFiles) {
-      console.log(`Chỉ có thể upload thêm ${maxFiles} hình ảnh`);
+      // console.log(`Chỉ có thể upload thêm ${maxFiles} hình ảnh`);
     }
 
     files.slice(0, maxFiles).forEach((file) => {
@@ -220,7 +220,7 @@ export class PostEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       if (file.size > 5 * 1024 * 1024) {
-        console.log(`${file.name} vượt quá 5MB`);
+        // console.log(`${file.name} vượt quá 5MB`);
         return;
       }
 
@@ -338,7 +338,7 @@ export class PostEditorComponent implements OnInit, AfterViewInit, OnDestroy {
           this.isSubmitting = false;
         },
         error: (error) => {
-          console.log(error.error?.message || 'Có lỗi xảy ra');
+          // console.log(error.error?.message || 'Có lỗi xảy ra');
           this.isSubmitting = false;
         },
       });

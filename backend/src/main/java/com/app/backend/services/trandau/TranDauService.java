@@ -564,23 +564,23 @@ public class TranDauService implements ITranDauService {
     @Override
     @Transactional
     public BattleFinishResponse finishBattle(Long tranDauId, Long currentUserId, boolean autoMode) throws Exception {
-        System.out.println(">>> [SERVICE] finishBattle CALLED, tranDauId=" + tranDauId
-                + ", currentUserId=" + currentUserId + ", autoMode=" + autoMode);
+//        System.out.println(">>> [SERVICE] finishBattle CALLED, tranDauId=" + tranDauId
+//                + ", currentUserId=" + currentUserId + ", autoMode=" + autoMode);
 
         TranDau td = tranDauRepository.findById(tranDauId)
                 .orElseThrow(() -> new DataNotFoundException("Trận đấu không tồn tại"));
 
-        System.out.println(">>> [SERVICE] tran_dau.trang_thai = " + td.getTrangThai());
+//        System.out.println(">>> [SERVICE] tran_dau.trang_thai = " + td.getTrangThai());
 
         // 1️⃣ Quyền hạn
         if (!autoMode && !td.getChuPhong().getId().equals(currentUserId)) {
-            System.out.println("❌ [SERVICE] finishBattle: currentUserId KHÔNG phải chủ phòng");
+//            System.out.println("❌ [SERVICE] finishBattle: currentUserId KHÔNG phải chủ phòng");
             throw new SecurityException("Chỉ chủ phòng mới có thể kết thúc trận đấu");
         }
 
         // Đã kết thúc rồi → trả kết quả cũ, KHÔNG publish WS nữa
         if (TrangThaiTranDau.HOAN_THANH.equals(td.getTrangThai())) {
-            System.out.println("⚠️ [SERVICE] Trận đấu đã ở trạng thái FINISHED, trả BattleFinishResponse cũ");
+//            System.out.println("⚠️ [SERVICE] Trận đấu đã ở trạng thái FINISHED, trả BattleFinishResponse cũ");
             return BattleFinishResponse.from(td, null, null, null, null);
         }
 
@@ -588,17 +588,17 @@ public class TranDauService implements ITranDauService {
         BattleState state = battleStateManager.get(tranDauId);
         if (state != null && !state.markFinishedOnce()) {
             // Có người khác finish trước rồi
-            System.out.println("⚠️ [SERVICE] markFinishedOnce = false, có luồng khác đã finish trước");
+//            System.out.println("⚠️ [SERVICE] markFinishedOnce = false, có luồng khác đã finish trước");
             return BattleFinishResponse.from(td, state.getDiemNguoiChoi(), null, null, null);
         }
 
         // 3️⃣ Lấy danh sách người chơi trong phòng
         List<NguoiChoiTranDau> players = nguoiChoiTranDauRepository.findAllByTranDau_Id(td.getId());
-        System.out.println(">>> [SERVICE] So nguoi_choi_tran_dau = " + players.size());
+//        System.out.println(">>> [SERVICE] So nguoi_choi_tran_dau = " + players.size());
 
         if (players.isEmpty()) {
             // Không có người chơi → chỉ đánh dấu FINISHED
-            System.out.println("⚠️ [SERVICE] Không có người chơi nào, chỉ set FINISHED và return");
+//            System.out.println("⚠️ [SERVICE] Không có người chơi nào, chỉ set FINISHED và return");
             td.setTrangThai(TrangThaiTranDau.HOAN_THANH);
             td.setKetThucLuc(Instant.now());
             tranDauRepository.save(td);
@@ -610,7 +610,7 @@ public class TranDauService implements ITranDauService {
         Map<Long, Integer> scoreMap = new HashMap<>();
         if (state != null && state.getDiemNguoiChoi() != null && !state.getDiemNguoiChoi().isEmpty()) {
             scoreMap.putAll(state.getDiemNguoiChoi());
-            System.out.println(">>> [SERVICE] scoreMap lấy từ BattleState size = " + scoreMap.size());
+//            System.out.println(">>> [SERVICE] scoreMap lấy từ BattleState size = " + scoreMap.size());
         } else {
             // fallback: từ bảng nguoi_choi_tran_dau
             for (NguoiChoiTranDau p : players) {
@@ -619,12 +619,12 @@ public class TranDauService implements ITranDauService {
                         p.getDiem() != null ? p.getDiem() : 0
                 );
             }
-            System.out.println(">>> [SERVICE] scoreMap fallback từ nguoi_choi_tran_dau size = " + scoreMap.size());
+//            System.out.println(">>> [SERVICE] scoreMap fallback từ nguoi_choi_tran_dau size = " + scoreMap.size());
         }
 
         // 5️⃣ Lấy log trả lời để tính số câu đúng + tổng thời gian
         List<TraLoiTranDau> logs = traLoiTranDauRepository.findAllByTranDau_Id(td.getId());
-        System.out.println(">>> [SERVICE] So tra_loi_tran_dau = " + logs.size());
+//        System.out.println(">>> [SERVICE] So tra_loi_tran_dau = " + logs.size());
 
         Map<Long, Integer> correctMap = new HashMap<>();
         Map<Long, Integer> totalTimeMap = new HashMap<>();
@@ -655,7 +655,7 @@ public class TranDauService implements ITranDauService {
         AtomicInteger rankCounter = new AtomicInteger(1);
         players.forEach(p -> p.setXepHang(rankCounter.getAndIncrement()));
         nguoiChoiTranDauRepository.saveAll(players);
-        System.out.println(">>> [SERVICE] Đã cập nhật diem/so_cau_dung/xep_hang cho nguoi_choi_tran_dau");
+//        System.out.println(">>> [SERVICE] Đã cập nhật diem/so_cau_dung/xep_hang cho nguoi_choi_tran_dau");
 
         // 7️⃣ Cập nhật winner + trạng thái trận
         NguoiChoiTranDau winnerPlayer = players.get(0);
@@ -663,8 +663,8 @@ public class TranDauService implements ITranDauService {
         td.setTrangThai(TrangThaiTranDau.HOAN_THANH);
         td.setKetThucLuc(Instant.now());
         tranDauRepository.save(td);
-        System.out.println(">>> [SERVICE] Winner = " + winnerPlayer.getNguoiDung().getHoTen()
-                + ", diem = " + winnerPlayer.getDiem());
+//        System.out.println(">>> [SERVICE] Winner = " + winnerPlayer.getNguoiDung().getHoTen()
+//                + ", diem = " + winnerPlayer.getDiem());
 
         // 8️⃣ Lưu lịch sử trận đấu
         Instant now = Instant.now();
@@ -753,7 +753,7 @@ public class TranDauService implements ITranDauService {
             }
         }
 
-        System.out.println(">>> [SERVICE] Đã lưu lich_su_tran_dau, size=" + lichSuList.size());
+//        System.out.println(">>> [SERVICE] Đã lưu lich_su_tran_dau, size=" + lichSuList.size());
 
         // 9️⃣ Phát WS FINISHED event
         FinishedEvent.Winner winData = FinishedEvent.Winner.builder()
@@ -764,8 +764,8 @@ public class TranDauService implements ITranDauService {
                 .soCauDung(winnerPlayer.getSoCauDung())
                 .build();
 
-        System.out.println("🔥 [SERVICE] Chuẩn bị publish FINISHED WS cho tran_dau_id = " + td.getId()
-                + ", so_nguoi_choi = " + players.size());
+//        System.out.println("🔥 [SERVICE] Chuẩn bị publish FINISHED WS cho tran_dau_id = " + td.getId()
+//                + ", so_nguoi_choi = " + players.size());
         Map<Long, Integer> maxComboMap = lichSuList.stream()
                 .collect(Collectors.toMap(
                         ls -> ls.getNguoiDung().getId(),

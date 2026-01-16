@@ -190,11 +190,11 @@ export class WsTrandauService {
    */
   private retry(getToken: () => string, userId: number, tranDauId: number) {
     if (this.reconnectTimeout) return;
-    console.log('♻️ Tự động reconnect WS sau 5s...');
+    // console.log('♻️ Tự động reconnect WS sau 5s...');
     this.reconnectTimeout = setTimeout(() => {
       this.connect(getToken, userId, tranDauId)
         .then((r) => {
-          console.log('✅ Reconnected WS thành công!');
+          // console.log('✅ Reconnected WS thành công!');
           this.reconnectTimeout = undefined;
         })
         .catch((err) => {

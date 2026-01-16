@@ -79,7 +79,7 @@ export class Header extends Base implements OnInit {
     // Gọi backend logout để set OFFLINE + revoke token
     this.userService.logoutBackend().subscribe({
       next: (res) => {
-        console.log('Logout backend ok:', res);
+        // console.log('Logout backend ok:', res);
         this.afterLogout();
       },
       error: (err) => {

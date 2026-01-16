@@ -33,7 +33,7 @@ export class AdminGuard {
 
     // Debug: Kiểm tra xem reload xong có lấy được role không
     // Bấm F12 xem tab Console khi reload
-    console.log('🔍 AdminGuard Check:', this.userResponse);
+    // console.log('🔍 AdminGuard Check:', this.userResponse);
 
     const roleName = this.userResponse?.vai_tro?.ten_vai_tro?.toUpperCase();
     const isAdmin = roleName === 'ROLE_ADMIN' || roleName === 'ADMIN';
@@ -45,7 +45,7 @@ export class AdminGuard {
       // 🛑 Đã đăng nhập nhưng KHÔNG PHẢI ADMIN
       // Đừng đẩy về Login (vì sẽ bị GuestGuard đá về Home)
       // Hãy đẩy về Home hoặc trang báo lỗi 403
-      console.log('Bạn không có quyền truy cập trang quản trị!');
+      // console.log('Bạn không có quyền truy cập trang quản trị!');
       this.router.navigate(['/home']);
       return false;
     }

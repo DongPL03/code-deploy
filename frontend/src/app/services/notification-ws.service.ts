@@ -31,7 +31,7 @@ export class NotificationWsService implements OnDestroy {
     this.client.configure({
       webSocketFactory: () => new SockJS(socketUrl),
       onConnect: (frame) => {
-        console.log('Connected to WS: ' + frame);
+        // console.log('Connected to WS: ' + frame);
         const dest = `/topic/notifications/${user_id}`;
         this.client.subscribe(dest, (msg: IMessage) => {
           if (!msg.body) return;
@@ -49,7 +49,7 @@ export class NotificationWsService implements OnDestroy {
         console.error('Additional details: ' + frame.body);
       },
       onWebSocketClose: () => {
-        console.log('WebSocket connection closed');
+        // console.log('WebSocket connection closed');
       }
     });
 

@@ -146,9 +146,9 @@ public class LuyenTapService implements ILuyenTapService {
                     && phien.getTongCauHoi() <= soLuongTheGhiNho
                     && phien.getTongCauHoi() <= boCauHoi.getSoCauHoi()) {
                 isPracticeFromMemo = true;
-                System.out.println("DEBUG guiDapAn: Phát hiện practice từ memo - tongCauHoi="
-                        + phien.getTongCauHoi() + ", soLuongTheGhiNho=" + soLuongTheGhiNho
-                        + ", soCauHoi=" + boCauHoi.getSoCauHoi());
+//                System.out.println("DEBUG guiDapAn: Phát hiện practice từ memo - tongCauHoi="
+//                        + phien.getTongCauHoi() + ", soLuongTheGhiNho=" + soLuongTheGhiNho
+//                        + ", soCauHoi=" + boCauHoi.getSoCauHoi());
             }
         }
 
@@ -185,9 +185,9 @@ public class LuyenTapService implements ILuyenTapService {
                             .collect(java.util.stream.Collectors.toList());
 
                     if (!memosToDelete.isEmpty()) {
-                        System.out.println("DEBUG guiDapAn: Xóa " + memosToDelete.size()
-                                + " the_ghi_nho của câu hỏi ID=" + cauHoi.getId()
-                                + " vì đã trả lời đúng trong practice từ memo");
+//                        System.out.println("DEBUG guiDapAn: Xóa " + memosToDelete.size()
+//                                + " the_ghi_nho của câu hỏi ID=" + cauHoi.getId()
+//                                + " vì đã trả lời đúng trong practice từ memo");
                         theGhiNhoRepository.deleteAll(memosToDelete);
                         theGhiNhoRepository.flush(); // Đảm bảo xóa ngay
                     }
@@ -210,8 +210,8 @@ public class LuyenTapService implements ILuyenTapService {
                                 .cauHoi(cauHoi)
                                 .build();
                         theGhiNhoRepository.save(memo);
-                        System.out.println("DEBUG guiDapAn: Thêm the_ghi_nho cho câu hỏi ID=" + cauHoi.getId()
-                                + " vì trả lời sai trong practice bình thường");
+//                        System.out.println("DEBUG guiDapAn: Thêm the_ghi_nho cho câu hỏi ID=" + cauHoi.getId()
+//                                + " vì trả lời sai trong practice bình thường");
                     }
                 }
             }
@@ -230,19 +230,19 @@ public class LuyenTapService implements ILuyenTapService {
 
         // Cập nhật progress trong khóa học (nếu bộ câu hỏi thuộc một khóa học)
         try {
-            System.out.println("DEBUG LuyenTapService.guiDapAn: Bắt đầu cập nhật progress - userId=" + userId
-                    + ", boCauHoiId=" + phien.getBoCauHoi().getId()
-                    + ", correctCount=" + correctCount);
+//            System.out.println("DEBUG LuyenTapService.guiDapAn: Bắt đầu cập nhật progress - userId=" + userId
+//                    + ", boCauHoiId=" + phien.getBoCauHoi().getId()
+//                    + ", correctCount=" + correctCount);
             tienDoKhoaHoiService.updateProgressAfterPractice(
                     userId,
                     phien.getBoCauHoi().getId(),
                     correctCount,
                     doChinhXac
             );
-            System.out.println("DEBUG LuyenTapService.guiDapAn: Đã cập nhật progress thành công");
+//            System.out.println("DEBUG LuyenTapService.guiDapAn: Đã cập nhật progress thành công");
         } catch (Exception e) {
             // Log lỗi nhưng không throw để không ảnh hưởng đến kết quả practice
-            System.err.println("❌ Lỗi khi cập nhật progress khóa học: " + e.getMessage());
+//            System.err.println("❌ Lỗi khi cập nhật progress khóa học: " + e.getMessage());
             e.printStackTrace(); // In full stack trace để debug
         }
 
@@ -353,10 +353,10 @@ public class LuyenTapService implements ILuyenTapService {
                 .distinct()
                 .collect(java.util.stream.Collectors.toList());
 
-        System.out.println("DEBUG batDauTuTheGhiNho: Tổng số the_ghi_nho = " + memos.size()
-                + ", Số câu hỏi distinct = " + selected.size()
-                + ", boCauHoiId = " + boCauHoiId
-                + ", userId = " + userId);
+//        System.out.println("DEBUG batDauTuTheGhiNho: Tổng số the_ghi_nho = " + memos.size()
+//                + ", Số câu hỏi distinct = " + selected.size()
+//                + ", boCauHoiId = " + boCauHoiId
+//                + ", userId = " + userId);
 
         // Xáo trộn cho đỡ nhàm chán
         java.util.Collections.shuffle(selected);

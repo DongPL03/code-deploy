@@ -46,7 +46,7 @@ export class PhongCho extends Base implements OnInit, OnDestroy {
       next: (res: ResponseObject<PageResponse<TranDauResponse>>) => {
         const data = res.data!;
         this.items = data.items || [];
-        console.log('Loaded pending battles:', this.items);
+        // console.log('Loaded pending battles:', this.items);
         this.totalPages = data.totalPages || 0;
         this.loading = false;
       },

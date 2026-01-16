@@ -64,12 +64,12 @@ export class LuyenTapKhoaHocComponent extends Base implements OnInit, OnDestroy 
       const urlSegments = this.route.snapshot.url.map((segment) => segment.path);
       this.practiceFromMemo = urlSegments.includes('memo');
 
-      console.log(
-        'DEBUG LuyenTapKhoaHocComponent: urlSegments =',
-        urlSegments,
-        ', practiceFromMemo =',
-        this.practiceFromMemo
-      );
+      // console.log(
+      //   'DEBUG LuyenTapKhoaHocComponent: urlSegments =',
+      //   urlSegments,
+      //   ', practiceFromMemo =',
+      //   this.practiceFromMemo
+      // );
 
       if (this.khoaHocId && this.boCauHoiId) {
         if (this.practiceFromMemo) {
@@ -134,8 +134,8 @@ export class LuyenTapKhoaHocComponent extends Base implements OnInit, OnDestroy 
       next: (res: ResponseObject<BatDauLuyenTapResponse>) => {
         this.loading.set(false);
         const data = res.data!;
-        console.log('DEBUG startPracticeFromMemo: Response từ API:', data);
-        console.log('DEBUG startPracticeFromMemo: Số lượng câu hỏi =', data?.cau_hoi_list?.length);
+        // console.log('DEBUG startPracticeFromMemo: Response từ API:', data);
+        // console.log('DEBUG startPracticeFromMemo: Số lượng câu hỏi =', data?.cau_hoi_list?.length);
         if (!data || !data.cau_hoi_list || data.cau_hoi_list.length === 0) {
           Swal.fire(
             'Không có câu hỏi',

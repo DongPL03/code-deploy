@@ -113,7 +113,7 @@ export class AdminTrandauDetail extends Base implements OnInit {
       .subscribe({
         next: (res: ResponseObject<any>) => {
           this.question_modal = res.data;
-          console.log('question_modal', this.question_modal);
+          // console.log('question_modal', this.question_modal);
           this.question_modal_loading = false;
         },
         error: (err: any) => {

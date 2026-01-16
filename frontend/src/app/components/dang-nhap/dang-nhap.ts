@@ -40,7 +40,7 @@ export class DangNhap extends Base {
   login() {
     this.userService.getIdVaiTro(this.usernameOrEmail).subscribe({
       next: (roleId: number) => {
-        console.log('roleId nhận được:', roleId);
+        // console.log('roleId nhận được:', roleId);
         const loginDTO = new LoginDTO({
           ...(this.usernameOrEmail.includes('@')
             ? {email: this.usernameOrEmail}
@@ -48,7 +48,7 @@ export class DangNhap extends Base {
           password: this.password,
           role_id: roleId,
         });
-        console.log('LoginDTO:', loginDTO);
+        // console.log('LoginDTO:', loginDTO);
         this.userService.login(loginDTO).pipe(
           tap((apiResponse: ResponseObject) => {
             const {token} = apiResponse.data;
@@ -65,13 +65,13 @@ export class DangNhap extends Base {
                 // if (this.rememberMe) {
                 this.userService.saveUserResponseToLocalStorage(this.userResponse);
                 // }
-                console.log('Thông tin người dùng:', this.userResponse);
-                console.log('Vai trò người dùng:', this.userResponse?.vai_tro?.ten_vai_tro);
+                // console.log('Thông tin người dùng:', this.userResponse);
+                // console.log('Vai trò người dùng:', this.userResponse?.vai_tro?.ten_vai_tro);
                 if (this.userResponse?.vai_tro?.ten_vai_tro === 'admin') {
                   this.router.navigate(['/admin']).then(r => {
                   });
                 } else if (this.userResponse?.vai_tro?.ten_vai_tro === 'user') {
-                  console.log('Đăng nhập thành công với vai trò nguoidung');
+                  // console.log('Đăng nhập thành công với vai trò nguoidung');
                   this.router.navigate(['/']).then(r => {
                   });
                 }

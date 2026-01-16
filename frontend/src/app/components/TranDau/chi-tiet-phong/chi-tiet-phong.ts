@@ -156,7 +156,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
     // Kiểm tra xem có cờ 'joined' được gửi từ PhongCho sang không
     const nav = this.router.currentNavigation();
     if (nav?.extras?.state?.['joined']) {
-      console.log('🚀 Đã verify PIN từ phòng chờ, set trạng thái đã tham gia.');
+      // console.log('🚀 Đã verify PIN từ phòng chờ, set trạng thái đã tham gia.');
       this.localJoinedState.set(true);
     }
     effect(() => {
@@ -180,7 +180,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
       if (this.timer) {
         return;
       }
-      console.log('💡 Effect tick() được kích hoạt cho câu', s.current_question_index + 1);
+      // console.log('💡 Effect tick() được kích hoạt cho câu', s.current_question_index + 1);
       this.tick(endAt);
     });
   }
@@ -196,7 +196,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
     this.wsTrandauService
       .connect(() => token, user.id, id)
       .then(() => {
-        console.log('✅ WebSocket connected!');
+        // console.log('✅ WebSocket connected!');
         this.wsTrandauService.subscribeBattle(id, (ev) => this.handleBattleEvent(ev));
       })
       .catch((err) => console.error('❌ WebSocket connect failed:', err));
@@ -206,7 +206,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
 
     [500, 1500, 3000].forEach((time) => {
       setTimeout(() => {
-        console.log(`🔄 [${time}ms] Đang gọi lại API để check số người...`);
+        // console.log(`🔄 [${time}ms] Đang gọi lại API để check số người...`);
         this.refreshRoomInfo();
       }, time);
     });
@@ -226,7 +226,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
     this.user = this.userService.getUserResponseFromLocalStorage();
     if (this.user?.avatar_url) {
       this.avatarUrl = this.imageBaseURL + this.user.avatar_url;
-      console.log('Avatar URL:', this.avatarUrl);
+      // console.log('Avatar URL:', this.avatarUrl);
     } else {
       this.avatarUrl = 'assets/images/default-profile-image.jpeg';
     }
@@ -238,7 +238,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
   private loadPlayersInRoom(battleId: number): void {
     this.tranDauService.getPlayersInRoom(battleId).subscribe({
       next: (res) => {
-        console.log('👥 Danh sách người chơi trong phòng:', res.data);
+        // console.log('👥 Danh sách người chơi trong phòng:', res.data);
         if (res.data) {
           this.playersInRoom.set(res.data);
           this.onlineCount.set(res.data.length);
@@ -276,7 +276,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
         // Bạn cần kiểm tra xem backend trả về key tên là 'leaderboard' hay 'nguoi_tham_gia'
         const players = (data as any).leaderboard || (data as any).nguoi_tham_gia || [];
 
-        console.log('Danh sách người chơi init:', players);
+        // console.log('Danh sách người chơi init:', players);
         this.leaderboard.set(players);
 
         // Sau khi dòng trên chạy, signal isJoined sẽ tự động tính lại -> thành TRUE
@@ -307,11 +307,11 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
   loadUserSummary(user_id: number) {
     this.userService.getUserSummary(user_id).subscribe({
       next: (res: ResponseObject<UserSummaryResponse>) => {
-        console.log('✅ Thống kê người dùng tải về:', res.data);
+        // console.log('✅ Thống kê người dùng tải về:', res.data);
         this.userSummary.set(res.data!);
       },
       error: (err) => {
-        console.error('❌ Lỗi khi tải thống kê người dùng:', err);
+        // console.error('❌ Lỗi khi tải thống kê người dùng:', err);
       },
     });
   }
@@ -439,7 +439,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
   // WEBSOCKET EVENT HANDLER
   // =====================================================
   handleBattleEvent(evt: BattleEvent) {
-    console.log('📡 WS Event:', evt);
+    // console.log('📡 WS Event:', evt);
     switch (evt.type) {
       case 'PLAYER_JOINED': {
         this.leaderboard.update((list) =>
@@ -670,7 +670,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
           myId,
         };
         this.mySummaryRow = this.finalResult.leaderboard.find((p) => p.user_id === myId);
-        console.log('🏆 Dòng kết quả của tôi:', this.mySummaryRow);
+        // console.log('🏆 Dòng kết quả của tôi:', this.mySummaryRow);
         this.isWinnerMe = !!(this.finalResult.winner && this.finalResult.winner.user_id === myId);
 
         // 🎵 Phát nhạc victory hoặc defeat
@@ -968,7 +968,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
         this.battle.set(data);
 
         // 🔍 LOG DATA RA ĐỂ KIỂM TRA XEM BACKEND TRẢ VỀ CÁI GÌ
-        console.log('🔍 Full Data từ API:', data);
+        // console.log('🔍 Full Data từ API:', data);
 
         // Xử lý linh hoạt tên biến (Backend có thể trả về camelCase hoặc snake_case)
         let count = 0;
@@ -983,7 +983,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
           count = (data as any).leaderboard.length;
         }
 
-        console.log('📊 Số người chốt lại là:', count);
+        // console.log('📊 /Số người chốt lại là:', count);
 
         // Chỉ cập nhật nếu count hợp lệ (> 0)
         if (count > 0) {
@@ -1381,7 +1381,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
     this.vatPhamService.getInventory().subscribe({
       next: (items) => {
         this.inventory.set(items);
-        console.log('📦 Inventory loaded:', items.length, 'items');
+        // console.log('📦 Inventory loaded:', items.length, 'items');
       },
       error: (err) => console.error('❌ Error loading inventory:', err),
     });
@@ -1493,8 +1493,8 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
    */
   private applyItemEffect(response: SuDungVatPhamResponse): void {
     const effect = response.hieu_ung;
-    console.log('🎁 applyItemEffect - response:', response);
-    console.log('🎁 applyItemEffect - hieu_ung:', effect);
+    // console.log('🎁 applyItemEffect - response:', response);
+    // console.log('🎁 applyItemEffect - hieu_ung:', effect);
     if (!effect) return;
 
     // X2/X3 điểm
@@ -1530,9 +1530,9 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
     }
 
     // Hiển thị đáp án đúng
-    console.log('🎁 Checking dap_an_dung:', effect.dap_an_dung);
+    // console.log('🎁 Checking dap_an_dung:', effect.dap_an_dung);
     if (effect.dap_an_dung) {
-      console.log('🎁 Showing correct answer popup:', effect.dap_an_dung);
+      // console.log('🎁 Showing correct answer popup:', effect.dap_an_dung);
       // Đóng tất cả popup hiện tại trước khi hiển thị đáp án
       Swal.close();
       setTimeout(() => {

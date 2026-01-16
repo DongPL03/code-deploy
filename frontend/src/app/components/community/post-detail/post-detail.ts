@@ -327,7 +327,7 @@ export class PostDetailComponent extends Base implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log(response.status);
+          // console.log(response.status);
           if (response.status === 'OK') {
             comment.daThich = !comment.daThich;
             comment.soLuotThich += comment.daThich ? 1 : -1;

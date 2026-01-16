@@ -166,7 +166,7 @@ public class TranDauController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<ResponseObject> finishBattle(@PathVariable Long id) throws Exception {
         Long uid = securityUtils.getLoggedInUserId();
-        System.out.println(">>> [CTRL] finishBattle called, tranDauId=" + id + ", currentUserId=" + uid);
+//        System.out.println(">>> [CTRL] finishBattle called, tranDauId=" + id + ", currentUserId=" + uid);
         BattleFinishResponse data = tranDauService.finishBattle(id, uid, false);
         return ResponseEntity.ok(
                 ResponseObject.builder()

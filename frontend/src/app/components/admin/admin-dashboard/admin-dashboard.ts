@@ -101,7 +101,7 @@ export class AdminDashboard extends Base implements OnInit, OnDestroy {
     this.adminService.get_dashboard_stats().subscribe({
       next: (res: ResponseObject<AdminDashboardStatsResponse>) => {
         const data = res.data!;
-        console.log('Dashboard stats:', data);
+        // console.log('Dashboard stats:', data);
         this.total_users = data.tong_nguoi_dung;
         this.total_bo_cau_hoi = data.tong_bo_cau_hoi;
         this.pending_bo_cau_hoi = data.tong_bo_cau_hoi_cho_duyet;
@@ -229,7 +229,7 @@ export class AdminDashboard extends Base implements OnInit, OnDestroy {
     this.adminStatsService.get_battles_by_day(days).subscribe({
       next: (res: ResponseObject<DateCountResponse[]>) => {
         this.battles_by_day = res.data ?? [];
-        console.log('Battles by day:', this.battles_by_day);
+        // console.log('Battles by day:', this.battles_by_day);
         this.loading_battles_chart = false;
 
         // map sang mảng labels / values cho chart

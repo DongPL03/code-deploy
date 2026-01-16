@@ -45,7 +45,7 @@ export class UserDetail extends Base implements OnInit {
     this.loading = true;
     this.userService.getUserById(userId).subscribe({
       next: (res: ResponseObject<UserResponse>) => {
-        console.log('User detail:', res.data);
+        // console.log('User detail:', res.data);
         this.user = res.data || null;
         this.loading = false;
       },
@@ -85,7 +85,7 @@ export class UserDetail extends Base implements OnInit {
           const p = res.data!;
           this.user_history_items = p.items || [];
           this.battleHistory = this.user_history_items;
-          console.log('User battle history:', this.battleHistory);
+          // console.log('User battle history:', this.battleHistory);
         },
         error: (err) => {
           this.user_history_loading = false;

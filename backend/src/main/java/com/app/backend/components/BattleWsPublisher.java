@@ -35,7 +35,7 @@ public class BattleWsPublisher {
         try {
             messagingTemplate.convertAndSend(topic(tranDauId), payload);
         } catch (Exception e) {
-            System.err.println("⚠️ [WS ERROR] Không thể gửi sự kiện WS: " + e.getMessage());
+//            System.err.println("⚠️ [WS ERROR] Không thể gửi sự kiện WS: " + e.getMessage());
         }
     }
 
@@ -110,8 +110,8 @@ public class BattleWsPublisher {
                                 FinishedEvent.Winner winner,
                                 List<FinishedEvent.Player> leaderboard) {
 
-        System.out.println("📤 [WS] FINISHED gửi tới /topic/battle." + tranDauId
-                + " | leaderboard size = " + (leaderboard != null ? leaderboard.size() : 0));
+//        System.out.println("📤 [WS] FINISHED gửi tới /topic/battle." + tranDauId
+//                + " | leaderboard size = " + (leaderboard != null ? leaderboard.size() : 0));
         var payload = FinishedEvent.builder()
                 .type("FINISHED")
                 .tranDauId(tranDauId)

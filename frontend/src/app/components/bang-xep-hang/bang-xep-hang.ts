@@ -69,7 +69,7 @@ export class BangXepHang extends Base implements OnInit {
       next: (res) => {
         const data = res.data;
         this.items = data?.items ?? [];
-        console.log(this.items);
+        // console.log(this.items);
         this.page = data?.currentPage ?? 0;
         this.totalPages = data?.totalPages ?? 0;
         this.loading = false;
@@ -134,7 +134,7 @@ export class BangXepHang extends Base implements OnInit {
     this.userService.getUserSummary(item.user_id).subscribe({
       next: (res) => {
         this.user_summary = res.data;
-        console.log(this.user_summary);
+        // console.log(this.user_summary);
         if (this.user_summary) {
           // Tính toán tỉ lệ thắng
           const {so_tran_thang, tong_tran} = this.user_summary;

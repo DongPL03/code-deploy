@@ -36,7 +36,7 @@ export class ChiTietKhoaHoc extends Base implements OnInit {
       next: (res: ResponseObject<KhoaHoiDetailResponse>) => {
         this.detail = res.data;
         // Debug: Log để kiểm tra da_mo_khoa
-        console.log('Course detail loaded:', this.detail);
+        // console.log('Course detail loaded:', this.detail);
         if (this.detail?.danh_sach_bo_cau_hoi) {
           this.detail.danh_sach_bo_cau_hoi.forEach((bo, index) => {
             console.log(
@@ -139,7 +139,7 @@ export class ChiTietKhoaHoc extends Base implements OnInit {
     this.unlocking[boCauHoi.bo_cau_hoi_id] = true;
     this.bocauHoiService.unlock_bo_cau_hoi(boCauHoi.bo_cau_hoi_id).subscribe({
       next: (res: ResponseObject<UnlockBoCauHoiResponse>) => {
-        console.log('Unlock response:', res);
+        // console.log('Unlock response:', res);
         this.unlocking[boCauHoi.bo_cau_hoi_id] = false;
         // Hiển thị thông báo trước
         Swal.fire({

@@ -36,8 +36,8 @@ public class WebSocketEventsListener {
         var accessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = accessor.getSessionId();
 
-        System.out.println("📡 New WS CONNECT from sessionId=" + sessionId);
-        System.out.println("📡 Headers = " + accessor.toNativeHeaderMap());
+//        System.out.println("📡 New WS CONNECT from sessionId=" + sessionId);
+//        System.out.println("📡 Headers = " + accessor.toNativeHeaderMap());
 
         String uidStr = accessor.getFirstNativeHeader("x-user-id");
         String tdStr = accessor.getFirstNativeHeader("x-trandau-id");
@@ -56,8 +56,8 @@ public class WebSocketEventsListener {
 
             wsPublisher.publishPlayerJoined(tranDauId, userId, userOpt.get().getHoTen(), soNguoi);
 
-            System.out.printf("✅ [%s] User #%d joined room #%d (%d người hiện tại)%n",
-                    sessionId, userId, tranDauId, soNguoi);
+//            System.out.printf("✅ [%s] User #%d joined room #%d (%d người hiện tại)%n",
+//                    sessionId, userId, tranDauId, soNguoi);
         } catch (Exception e) {
             System.err.printf("❌ Lỗi onConnect (sessionId=%s): %s%n", sessionId, e.getMessage());
         }
@@ -71,7 +71,7 @@ public class WebSocketEventsListener {
         Long tranDauId = sessionToTranDau.remove(sessionId);
 
         if (userId == null || tranDauId == null) {
-            System.out.printf("⚠️ Bỏ qua disconnect không có mapping (sessionId=%s)%n", sessionId);
+//            System.out.printf("⚠️ Bỏ qua disconnect không có mapping (sessionId=%s)%n", sessionId);
             return;
         }
 
@@ -90,11 +90,11 @@ public class WebSocketEventsListener {
                     soNguoi
             );
 
-            System.out.printf("👋 [%s] User #%d left room #%d (%d người còn lại)%n",
-                    sessionId, userId, tranDauId, soNguoi);
+//            System.out.printf("👋 [%s] User #%d left room #%d (%d người còn lại)%n",
+//                    sessionId, userId, tranDauId, soNguoi);
 
         } catch (Exception e) {
-            System.err.printf("❌ Lỗi onDisconnect: %s%n", e.getMessage());
+//            System.err.printf("❌ Lỗi onDisconnect: %s%n", e.getMessage());
         }
     }
 }
