@@ -43,16 +43,28 @@ export class CauHoiEdit extends Base implements OnInit {
     this.cauHoiService.getById(this.questionId).subscribe({
       next: (res: ResponseObject<CauHoiResponse>) => {
         this.question = res.data!;
-        // Copy dữ liệu sang model
-        this.model = { ...this.model, ...res.data };
+        const d = res.data!;
+
+        // Chỉ copy các field cần thiết cho DTO
+        this.model.bo_cau_hoi_id = d.bo_cau_hoi_id;
+        this.model.noi_dung = d.noi_dung;
+        this.model.do_kho = d.do_kho as any;
+        this.model.loai_noi_dung = d.loai_noi_dung as any;
+        this.model.duong_dan_tep = d.duong_dan_tep;
+        this.model.lua_chon_a = d.lua_chon_a;
+        this.model.lua_chon_b = d.lua_chon_b;
+        this.model.lua_chon_c = d.lua_chon_c;
+        this.model.lua_chon_d = d.lua_chon_d;
+        this.model.dap_an_dung = d.dap_an_dung as any;
+        this.model.giai_thich = d.giai_thich;
 
         // Xử lý preview URL nếu có
-        if (res.data?.duong_dan_tep) {
+        if (d.duong_dan_tep) {
           // Nếu đường dẫn đã chứa http thì dùng luôn, không thì nối chuỗi
-          if (res.data.duong_dan_tep.startsWith('http')) {
-            this.previewUrl = res.data.duong_dan_tep;
+          if (d.duong_dan_tep.startsWith('http')) {
+            this.previewUrl = d.duong_dan_tep;
           } else {
-            this.previewUrl = `${this.imageBaseURL}${res.data.duong_dan_tep}`;
+            this.previewUrl = `${this.imageBaseURL}${d.duong_dan_tep}`;
           }
         }
 
@@ -104,13 +116,24 @@ export class CauHoiEdit extends Base implements OnInit {
 
     this.saving = true;
 
-    // Tạo bản copy của model để gửi lên server
-    const updateData = { ...this.model };
+    // Tạo bản copy của model để gửi lên server - CHỈ lấy các field cần thiết
+    const updateData: any = {
+      bo_cau_hoi_id: this.model.bo_cau_hoi_id,
+      noi_dung: this.model.noi_dung,
+      do_kho: this.model.do_kho,
+      loai_noi_dung: this.model.loai_noi_dung,
+      lua_chon_a: this.model.lua_chon_a,
+      lua_chon_b: this.model.lua_chon_b,
+      lua_chon_c: this.model.lua_chon_c,
+      lua_chon_d: this.model.lua_chon_d,
+      dap_an_dung: this.model.dap_an_dung,
+      giai_thich: this.model.giai_thich || '',
+    };
 
-    // Nếu người dùng chọn file mới, KHÔNG gửi duong_dan_tep trong update request
-    // File sẽ được upload riêng sau đó
-    if (this.selectedFile) {
-      delete updateData.duong_dan_tep;
+    // Nếu KHÔNG có file mới được chọn, giữ nguyên đường dẫn cũ
+    // Nếu CÓ file mới, KHÔNG gửi duong_dan_tep (sẽ upload riêng sau)
+    if (!this.selectedFile && this.model.duong_dan_tep) {
+      updateData.duong_dan_tep = this.model.duong_dan_tep;
     }
 
     // Bước 1: Cập nhật thông tin text trước
