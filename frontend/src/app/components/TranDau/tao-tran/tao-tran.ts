@@ -155,14 +155,14 @@ export class TaoTran extends Base implements OnInit {
       return;
     }
 
-    if (this.form.gioi_han_nguoi_choi < 2 || this.form.gioi_han_nguoi_choi > 4) {
-      Swal.fire('Sai giới hạn người chơi', 'Giới hạn người chơi phải từ 2–4', 'info').then(r => {
+    if (this.form.gioi_han_nguoi_choi < 2 || this.form.gioi_han_nguoi_choi > 30) {
+      Swal.fire('Sai giới hạn người chơi', 'Giới hạn người chơi phải từ 2–30', 'info').then(r => {
       });
       return;
     }
 
-    if (this.form.gioi_han_thoi_gian_cau_giay < 5) {
-      Swal.fire('Thời gian mỗi câu quá thấp', 'Tối thiểu 5 giây mỗi câu', 'info').then(r => {
+    if (this.form.gioi_han_thoi_gian_cau_giay < 10) {
+      Swal.fire('Thời gian mỗi câu quá thấp', 'Tối thiểu 10 giây mỗi câu', 'info').then(r => {
       });
       return;
     }

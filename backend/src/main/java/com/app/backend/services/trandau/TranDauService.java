@@ -99,8 +99,8 @@ public class TranDauService implements ITranDauService {
             throw new IllegalArgumentException("Bộ câu hỏi Official phải ở chế độ PRIVATE");
         }
 
-        if (taoTranDauDTO.getGioiHanNguoiChoi() < 2 || taoTranDauDTO.getGioiHanNguoiChoi() > 4) {
-            throw new IllegalArgumentException("Giới hạn người chơi phải từ 2 – 4");
+        if (taoTranDauDTO.getGioiHanNguoiChoi() < 2 || taoTranDauDTO.getGioiHanNguoiChoi() > 30) {
+            throw new IllegalArgumentException("Giới hạn người chơi phải từ 2 – 30");
         }
         TranDau tranDau = new TranDau();
         tranDau.setTenPhong(taoTranDauDTO.getTenPhong());

@@ -1,35 +1,44 @@
-import {CommonModule} from '@angular/common';
-import {Component, computed, effect, inject, OnDestroy, OnInit, signal} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import {
+  Component,
+  computed,
+  effect,
+  HostListener,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
-import {RoiTranDauDTO} from '../../../dtos/tran-dau/roitran-dto';
-import {SubmitAnswerDTO} from '../../../dtos/tran-dau/submitanswer-dto';
-import {ThamGiaTranDauDTO} from '../../../dtos/tran-dau/thamgiatrandau-dto';
-import {environment} from '../../../environments/environment';
-import {ResponseObject} from '../../../responses/response-object';
-import {FinishedPlayer} from '../../../responses/trandau/finished-player';
-import {LichSuTranDauResponse} from '../../../responses/trandau/lichsutrandau';
-import {NguoiChoiTrongPhongResponse} from '../../../responses/trandau/nguoi-choi-trong-phong-response';
-import {SyncStateResponse} from '../../../responses/trandau/syncstate-response';
-import {TranDauResponse} from '../../../responses/trandau/trandau-response';
-import {BattleEvent} from '../../../services/ws-trandau.service';
-import {Base} from '../../base/base';
+import { RoiTranDauDTO } from '../../../dtos/tran-dau/roitran-dto';
+import { SubmitAnswerDTO } from '../../../dtos/tran-dau/submitanswer-dto';
+import { ThamGiaTranDauDTO } from '../../../dtos/tran-dau/thamgiatrandau-dto';
+import { environment } from '../../../environments/environment';
+import { ResponseObject } from '../../../responses/response-object';
+import { FinishedPlayer } from '../../../responses/trandau/finished-player';
+import { LichSuTranDauResponse } from '../../../responses/trandau/lichsutrandau';
+import { NguoiChoiTrongPhongResponse } from '../../../responses/trandau/nguoi-choi-trong-phong-response';
+import { SyncStateResponse } from '../../../responses/trandau/syncstate-response';
+import { TranDauResponse } from '../../../responses/trandau/trandau-response';
+import { BattleEvent } from '../../../services/ws-trandau.service';
+import { Base } from '../../base/base';
 
-import {PickerComponent} from '@ctrl/ngx-emoji-mart';
-import {finalize} from 'rxjs/operators';
+import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { finalize } from 'rxjs/operators';
 import {
   LoaiVatPham,
   SuDungVatPhamResponse,
   VatPhamInventory,
   VatPhamUtils,
 } from '../../../models/vat-pham.model';
-import {FriendSummaryResponse} from '../../../responses/banbe/friend_summary_response';
-import {ChatMessage} from '../../../responses/nguoidung/chatmessage';
-import {UserResponse} from '../../../responses/nguoidung/user-response';
-import {UserSummaryResponse} from '../../../responses/nguoidung/user-summary-response';
-import {VatPhamService} from '../../../services/vat-pham.service';
+import { FriendSummaryResponse } from '../../../responses/banbe/friend_summary_response';
+import { ChatMessage } from '../../../responses/nguoidung/chatmessage';
+import { UserResponse } from '../../../responses/nguoidung/user-response';
+import { UserSummaryResponse } from '../../../responses/nguoidung/user-summary-response';
+import { VatPhamService } from '../../../services/vat-pham.service';
 
-import {RouterLink} from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-chi-tiet-phong',
@@ -151,6 +160,12 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
   // Thêm vào đầu class
   showRoundLeaderboard = signal<boolean>(false);
 
+  // ================== ANTI-CHEAT SYSTEM ==================
+  tabSwitchCount = signal<number>(0); // Số lần tab ra ngoài
+  readonly MAX_TAB_SWITCHES = 3; // Số lần tối đa được phép
+  tabSwitchWarningShown = false;
+  private visibilityHandler!: () => void;
+
   constructor() {
     super();
     // Kiểm tra xem có cờ 'joined' được gửi từ PhongCho sang không
@@ -211,7 +226,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
       }, time);
     });
     this.currentUserName();
-    setTimeout(() => this.syncState.update((s) => (s ? {...s} : s)), 200);
+    setTimeout(() => this.syncState.update((s) => (s ? { ...s } : s)), 200);
     this.loadUserInfo();
     this.loadInventory();
 
@@ -220,6 +235,178 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
 
     // 🎵 Phát nhạc lobby khi vào phòng chờ
     this.audioService.playBgMusic('lobby');
+
+    // 🛡️ ANTI-CHEAT: Khởi tạo hệ thống chống gian lận
+    this.initAntiCheat();
+  }
+
+  // ================== ANTI-CHEAT METHODS ==================
+
+  /**
+   * 🛡️ Khởi tạo hệ thống chống gian lận
+   */
+  private initAntiCheat(): void {
+    // Đăng ký listener cho visibility change
+    this.visibilityHandler = this.onVisibilityChange.bind(this);
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+  }
+
+  /**
+   * 🛡️ Xử lý khi người dùng chuyển tab
+   */
+  private onVisibilityChange(): void {
+    // Chỉ kiểm tra khi trận đấu đang diễn ra
+    if (!this.isOngoing()) return;
+
+    if (document.hidden) {
+      // Người dùng tab ra ngoài
+      const count = this.tabSwitchCount() + 1;
+      this.tabSwitchCount.set(count);
+
+      console.warn(`⚠️ [ANTI-CHEAT] Tab switch detected! Count: ${count}/${this.MAX_TAB_SWITCHES}`);
+
+      if (count >= this.MAX_TAB_SWITCHES) {
+        // Quá số lần cho phép → kick khỏi phòng
+        this.handleCheatDetected('tab_switch');
+      } else {
+        // Cảnh báo
+        this.showTabSwitchWarning(count);
+      }
+    }
+  }
+
+  /**
+   * 🛡️ Hiển thị cảnh báo khi tab ra ngoài
+   */
+  private showTabSwitchWarning(count: number): void {
+    const remaining = this.MAX_TAB_SWITCHES - count;
+    Swal.fire({
+      icon: 'warning',
+      title: '⚠️ Cảnh báo gian lận!',
+      html: `
+        <p>Bạn đã chuyển tab <strong>${count}</strong> lần.</p>
+        <p>Còn <strong>${remaining}</strong> lần nữa bạn sẽ bị loại khỏi trận đấu!</p>
+        <p class="text-muted">Vui lòng không rời khỏi trang trong khi thi đấu.</p>
+      `,
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+      allowOutsideClick: false,
+    });
+  }
+
+  /**
+   * 🛡️ Xử lý khi phát hiện gian lận
+   */
+  private handleCheatDetected(reason: 'tab_switch' | 'copy_paste'): void {
+    const messages = {
+      tab_switch: 'Bạn đã chuyển tab quá nhiều lần.',
+      copy_paste: 'Phát hiện hành vi sao chép nội dung.',
+    };
+
+    Swal.fire({
+      icon: 'error',
+      title: '🚫 Phát hiện gian lận!',
+      html: `
+        <p>${messages[reason]}</p>
+        <p>Bạn sẽ bị loại khỏi trận đấu.</p>
+      `,
+      allowOutsideClick: false,
+      showConfirmButton: true,
+      confirmButtonText: 'Đồng ý',
+    }).then(() => {
+      // Rời khỏi trận đấu
+      this.leaveRoomDueToCheat();
+    });
+  }
+
+  /**
+   * 🛡️ Rời phòng do gian lận
+   */
+  private leaveRoomDueToCheat(): void {
+    const b = this.battle();
+    if (!b) {
+      this.router.navigateByUrl('/home');
+      return;
+    }
+
+    const dto: RoiTranDauDTO = { tran_dau_id: b.id };
+    this.tranDauService.leaveBattle(dto).subscribe({
+      next: () => {
+        console.log('🚪 Đã rời phòng do vi phạm quy định.');
+        this.router.navigateByUrl('/home');
+      },
+      error: () => {
+        this.router.navigateByUrl('/home');
+      },
+    });
+  }
+
+  /**
+   * 🛡️ Chặn copy (Ctrl+C, context menu copy)
+   */
+  @HostListener('document:copy', ['$event'])
+  onCopy(event: ClipboardEvent): void {
+    if (this.isOngoing()) {
+      event.preventDefault();
+      Swal.fire({
+        icon: 'warning',
+        title: '🚫 Không được phép!',
+        text: 'Không được sao chép nội dung trong khi thi đấu.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  }
+
+  /**
+   * 🛡️ Chặn paste
+   */
+  @HostListener('document:paste', ['$event'])
+  onPaste(event: ClipboardEvent): void {
+    if (this.isOngoing()) {
+      event.preventDefault();
+      Swal.fire({
+        icon: 'warning',
+        title: '🚫 Không được phép!',
+        text: 'Không được dán nội dung trong khi thi đấu.',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  }
+
+  /**
+   * 🛡️ Chặn chuột phải (context menu)
+   */
+  @HostListener('document:contextmenu', ['$event'])
+  onContextMenu(event: MouseEvent): void {
+    if (this.isOngoing()) {
+      event.preventDefault();
+    }
+  }
+
+  /**
+   * 🛡️ Chặn các phím tắt gian lận
+   */
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    if (!this.isOngoing()) return;
+
+    // Chặn F12 (DevTools)
+    if (event.key === 'F12') {
+      event.preventDefault();
+    }
+
+    // Chặn Ctrl+Shift+I (DevTools)
+    if (event.ctrlKey && event.shiftKey && event.key === 'I') {
+      event.preventDefault();
+    }
+
+    // Chặn Ctrl+U (View Source)
+    if (event.ctrlKey && event.key === 'u') {
+      event.preventDefault();
+    }
   }
 
   private loadUserInfo(): void {
@@ -253,8 +440,13 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.clearTimer();
     this.wsTrandauService.disconnect();
-    // 🎵 Dừng nhạc khi rời phòng
+    // 🎵 Dừng TẤT CẢ nhạc khi rời phòng (cả bgMusic và SFX victory/defeat)
     this.audioService.stopBgMusic();
+    this.audioService.stopSfx();
+    // 🛡️ Cleanup anti-cheat listeners
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+    }
   }
 
   // =====================================================
@@ -342,7 +534,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
   join() {
     const b = this.battle();
     if (!b) return;
-    const dto: ThamGiaTranDauDTO = {tran_dau_id: b.id};
+    const dto: ThamGiaTranDauDTO = { tran_dau_id: b.id };
     if (!b.cong_khai) dto.ma_pin = this.pinCode();
     this.saving.set(true);
     this.tranDauService
@@ -351,8 +543,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.joinedBattle.set(true);
-          Swal.fire('Thành công', 'Bạn đã tham gia phòng', 'success').then(() => {
-          });
+          Swal.fire('Thành công', 'Bạn đã tham gia phòng', 'success').then(() => {});
 
           this.localJoinedState.set(true);
           // ⬇️ Sau khi join xong, gọi lại detail để lấy đúng số người tham gia (lúc này DB đã là 2)
@@ -362,8 +553,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
         error: (e) => {
           // Nếu lỗi là "User đã tham gia", ta coi như thành công
           if (e?.error?.message?.includes('đã tham gia')) {
-            Swal.fire('Đã tham gia', 'Bạn đã ở trong phòng này rồi', 'info').then(() => {
-            });
+            Swal.fire('Đã tham gia', 'Bạn đã ở trong phòng này rồi', 'info').then(() => {});
             this.refreshRoomInfo();
             this.doSync();
           } else {
@@ -371,8 +561,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
               'Không thể tham gia',
               e?.error?.message || 'Vui lòng kiểm tra lại',
               'error'
-            ).then(() => {
-            });
+            ).then(() => {});
           }
         },
       });
@@ -397,8 +586,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
       // TRƯỜNG HỢP 1: Chưa tham gia (đang xem) -> Chỉ cần chuyển trang về Home
       if (!this.isJoined()) {
         this.wsTrandauService.disconnect(); // Ngắt kết nối socket cho sạch
-        this.router.navigateByUrl('/home').then((r) => {
-        });
+        this.router.navigateByUrl('/home').then((r) => {});
         return; // Dừng hàm tại đây, không gọi API bên dưới
       }
 
@@ -406,29 +594,25 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
       const b = this.battle();
       if (!b) return;
 
-      const dto: RoiTranDauDTO = {tran_dau_id: b.id};
+      const dto: RoiTranDauDTO = { tran_dau_id: b.id };
       this.saving.set(true);
 
       this.tranDauService.leaveBattle(dto as any).subscribe({
         next: () => {
           this.saving.set(false);
-          Swal.fire('Đã rời phòng', '', 'success').then(() => {
-          });
+          Swal.fire('Đã rời phòng', '', 'success').then(() => {});
           this.wsTrandauService.disconnect();
-          this.router.navigateByUrl('/home').then((r) => {
-          });
+          this.router.navigateByUrl('/home').then((r) => {});
         },
         error: (e) => {
           this.saving.set(false);
           // Dù lỗi API (do mạng lag hay gì đó) thì cũng nên cho người dùng thoát ra
           // Nếu muốn chặt chẽ thì giữ alert, nếu muốn UX mượt thì navigate luôn
-          Swal.fire('Lỗi', e?.error?.message || 'Không thể rời phòng', 'error').then((r) => {
-          });
+          Swal.fire('Lỗi', e?.error?.message || 'Không thể rời phòng', 'error').then((r) => {});
 
           // Option: Nếu API lỗi "Bạn chưa ở trong phòng", ta vẫn cho họ về Home luôn
           if (e?.error?.message?.includes('chưa ở trong phòng')) {
-            this.router.navigateByUrl('/home').then((r) => {
-            });
+            this.router.navigateByUrl('/home').then((r) => {});
           }
         },
       });
@@ -443,10 +627,9 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
     switch (evt.type) {
       case 'PLAYER_JOINED': {
         this.leaderboard.update((list) =>
-          list.map((p) => (p.user_id === evt.user_id ? {...p, da_roi: false} : p))
+          list.map((p) => (p.user_id === evt.user_id ? { ...p, da_roi: false } : p))
         );
-        Swal.fire('👋 Người chơi mới', `${evt.ho_ten} vừa tham gia phòng`, 'info').then((r) => {
-        });
+        Swal.fire('👋 Người chơi mới', `${evt.ho_ten} vừa tham gia phòng`, 'info').then((r) => {});
         this.refreshRoomInfo();
         // 🔹 Refresh danh sách người chơi trong phòng
         const battleId = this.battle()?.id;
@@ -456,10 +639,9 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
       case 'PLAYER_LEFT': {
         // Đánh dấu "đã rời trận" trên leaderboard
         this.leaderboard.update((list) =>
-          list.map((p) => (p.user_id === evt.user_id ? {...p, da_roi: true} : p))
+          list.map((p) => (p.user_id === evt.user_id ? { ...p, da_roi: true } : p))
         );
-        Swal.fire('🚪 Người chơi rời đi', `${evt.ho_ten} đã rời phòng`, 'warning').then((r) => {
-        });
+        Swal.fire('🚪 Người chơi rời đi', `${evt.ho_ten} đã rời phòng`, 'warning').then((r) => {});
         this.refreshRoomInfo();
         // 🔹 Refresh danh sách người chơi trong phòng
         const leftBattleId = this.battle()?.id;
@@ -528,7 +710,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
           _version: Math.random(),
         };
 
-        this.syncState.set({...newState});
+        this.syncState.set({ ...newState });
 
         // ⛔ reset trạng thái nộp của câu mới
         this.submittedCurrentAnswer.set(false);
@@ -556,7 +738,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
           this.revealedCorrectAnswer.set(dapAn);
           this.revealedExplanation.set(giaiThich);
         } else {
-          console.error("❌ Không tìm thấy dap_an_dung trong payload:", payload);
+          console.error('❌ Không tìm thấy dap_an_dung trong payload:', payload);
         }
 
         // Lấy kết quả từ biến tạm và hiển thị
@@ -601,11 +783,10 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
           }
 
           // Cập nhật điểm tổng lên UI (Lúc này mới cập nhật để tạo bất ngờ)
-          this.syncState.update((s) => (s ? {...s, my_total_points: myResult.totalPoints} : s));
+          this.syncState.update((s) => (s ? { ...s, my_total_points: myResult.totalPoints } : s));
 
           // Reset biến tạm để tránh lặp lại
           this.pendingResult.set(null);
-
         } else {
           // Trường hợp người chơi KHÔNG nộp bài (Hết giờ mà chưa submit)
           Swal.fire({
@@ -615,7 +796,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
             toast: true,
             position: 'top',
             showConfirmButton: false,
-            timer: 1500
+            timer: 1500,
           });
         }
         break;
@@ -629,7 +810,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
           correct: evt.correct,
           gainedPoints: evt.gained_points || 0,
           combo: evt.combo_streak || 0,
-          totalPoints: evt.total_points
+          totalPoints: evt.total_points,
         });
 
         // 2. Chỉ hiện thông báo chờ (Suspense)
@@ -662,7 +843,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
       }
 
       case 'FINISHED': {
-        this.battle.set({...(this.battle() as TranDauResponse), trang_thai: 'HOAN_THANH'});
+        this.battle.set({ ...(this.battle() as TranDauResponse), trang_thai: 'HOAN_THANH' });
         const myId = this.userService.getUserId();
         this.finalResult = {
           winner: evt.winner,
@@ -767,7 +948,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
     this.tranDauService.startBattle(id).subscribe({
       next: (res) => {
         this.saving.set(false);
-        this.battle.set({...(this.battle() as TranDauResponse), trang_thai: 'DANG_CHOI'});
+        this.battle.set({ ...(this.battle() as TranDauResponse), trang_thai: 'DANG_CHOI' });
         this.doSync();
       },
       error: (e) => {
@@ -776,8 +957,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
           'Không thể bắt đầu',
           e?.error?.message || 'Bạn có quyền chủ phòng?',
           'error'
-        ).then((r) => {
-        });
+        ).then((r) => {});
       },
     });
   }
@@ -799,16 +979,14 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
       this.tranDauService.finishBattle(id).subscribe({
         next: () => {
           this.saving.set(false);
-          this.battle.set({...(this.battle() as TranDauResponse), trang_thai: 'HOAN_THANH'});
-          Swal.fire('Đã kết thúc', 'Xem bảng xếp hạng ở phía dưới', 'success').then((r) => {
-          });
+          this.battle.set({ ...(this.battle() as TranDauResponse), trang_thai: 'HOAN_THANH' });
+          Swal.fire('Đã kết thúc', 'Xem bảng xếp hạng ở phía dưới', 'success').then((r) => {});
           this.doSync();
         },
         error: (e) => {
           this.saving.set(false);
           Swal.fire('Không thể kết thúc', e?.error?.message || 'Thử lại sau', 'error').then(
-            (r) => {
-            }
+            (r) => {}
           );
         },
       });
@@ -822,15 +1000,13 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
 
     // ⛔ đã nộp câu hiện tại rồi
     if (this.submittedCurrentAnswer()) {
-      Swal.fire('Bạn đã nộp đáp án', 'Hãy chờ câu hỏi tiếp theo nhé', 'info').then(() => {
-      });
+      Swal.fire('Bạn đã nộp đáp án', 'Hãy chờ câu hỏi tiếp theo nhé', 'info').then(() => {});
       return;
     }
 
     const ans = this.selectedAnswer();
     if (!ans) {
-      Swal.fire('Chưa chọn đáp án', 'Hãy chọn A/B/C/D', 'info').then((r) => {
-      });
+      Swal.fire('Chưa chọn đáp án', 'Hãy chọn A/B/C/D', 'info').then((r) => {});
       return;
     }
 
@@ -866,8 +1042,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
         // Nếu lỗi thì cho phép nộp lại
         this.submittedCurrentAnswer.set(false);
         Swal.fire('Không thể nộp đáp án', e?.error?.message || 'Thử lại sau', 'error').then(
-          (r) => {
-          }
+          (r) => {}
         );
       },
     });
@@ -885,7 +1060,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
 
     // 3. Gọi API
     this.tranDauService
-      .sendChat({tran_dau_id: battleId, noi_dung: content} as any)
+      .sendChat({ tran_dau_id: battleId, noi_dung: content } as any)
       .pipe(
         // Dùng finalize để luôn tắt loading dù thành công hay thất bại
         finalize(() => this.saving.set(false))
@@ -911,8 +1086,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
             position: 'top-end',
             showConfirmButton: false,
             timer: 3000,
-          }).then((r) => {
-          });
+          }).then((r) => {});
         },
       });
   }
@@ -1047,13 +1221,11 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
   });
 
   goBackToBattleList() {
-    this.router.navigateByUrl('/tran-dau/pending').then((r) => {
-    }); // hoặc '/battle/danh-sach-bo-cau-hoi'
+    this.router.navigateByUrl('/tran-dau/pending').then((r) => {}); // hoặc '/battle/danh-sach-bo-cau-hoi'
   }
 
   goBackHome() {
-    this.router.navigateByUrl('/home').then((r) => {
-    });
+    this.router.navigateByUrl('/home').then((r) => {});
   }
 
   get summary_leaderboard(): FinishedPlayer[] {
@@ -1079,8 +1251,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
           bo_cau_hoi_id: boId,
         },
       })
-      .then((r) => {
-      });
+      .then((r) => {});
   }
 
   startPreCountdown(seconds: number) {
@@ -1265,10 +1436,10 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
 
       <div class="victory-header-cartoon">
         <img src="${
-      this.isWinnerMe
-        ? 'https://cdn-icons-png.flaticon.com/512/2583/2583344.png'
-        : 'https://cdn-icons-png.flaticon.com/512/1055/1055666.png'
-    }"
+          this.isWinnerMe
+            ? 'https://cdn-icons-png.flaticon.com/512/2583/2583344.png'
+            : 'https://cdn-icons-png.flaticon.com/512/1055/1055666.png'
+        }"
           class="victory-icon-img">
       </div>
 
@@ -1334,8 +1505,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
           }
         }, 300);
       },
-    }).then(() => {
-    });
+    }).then(() => {});
   }
 
   triggerComboVFX() {
@@ -1453,7 +1623,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
           this.inventory.update((inv) =>
             inv
               .map((i) =>
-                i.loai === item.loai ? {...i, so_luong: response.so_luong_con_lai} : i
+                i.loai === item.loai ? { ...i, so_luong: response.so_luong_con_lai } : i
               )
               .filter((i) => i.so_luong > 0)
           );
@@ -1601,7 +1771,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
         this.user_modal_summary = res.data;
         if (this.user_modal_summary) {
           // Tính toán tỉ lệ thắng
-          const {so_tran_thang, tong_tran} = this.user_modal_summary;
+          const { so_tran_thang, tong_tran } = this.user_modal_summary;
           this.user_modal_summary.ti_le_thang = tong_tran > 0 ? so_tran_thang / tong_tran : 0;
         }
         this.user_modal_loading = false;
@@ -1671,7 +1841,7 @@ export class ChiTietPhong extends Base implements OnInit, OnDestroy {
       cancelButtonText: 'Hủy',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.friendService.sendRequest({target_user_id: userId}).subscribe({
+        this.friendService.sendRequest({ target_user_id: userId }).subscribe({
           next: () => {
             Swal.fire({
               toast: true,

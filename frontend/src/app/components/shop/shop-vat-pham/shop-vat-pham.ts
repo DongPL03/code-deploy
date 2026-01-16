@@ -4,6 +4,7 @@ import {FormsModule} from '@angular/forms';
 import Swal from 'sweetalert2';
 import {MuaVatPhamResponse, ShopItem, ShopResponse} from '../../../models/vat-pham.model';
 import {VatPhamService} from '../../../services/vat-pham.service';
+import {Base} from '../../base/base';
 
 @Component({
   selector: 'app-shop-vat-pham',
@@ -12,7 +13,7 @@ import {VatPhamService} from '../../../services/vat-pham.service';
   templateUrl: './shop-vat-pham.html',
   styleUrl: './shop-vat-pham.scss',
 })
-export class ShopVatPham implements OnInit {
+export class ShopVatPham extends Base implements OnInit {
   private vatPhamService = inject(VatPhamService);
 
   // State
@@ -59,6 +60,7 @@ export class ShopVatPham implements OnInit {
 
   ngOnInit(): void {
     this.loadShop();
+    this.audioService.playBgMusic('home');
   }
 
   loadShop(): void {
