@@ -13,11 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CauHoiService implements ICauHoiService {
     private final ICauHoiRepository cauHoiRepository;
     private final IBoCauHoiRepository boCauHoiRepository;
